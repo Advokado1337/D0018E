@@ -1,3 +1,5 @@
+import autoprefixer from "autoprefixer"
+import tailwindcss from "tailwindcss"
 import { fileURLToPath } from "url"
 import path from "path"
 
@@ -17,7 +19,7 @@ export default {
     module: {
         rules: [
             {
-                test: /\.jsx?$/, // to process both .js and .jsx files
+                test: /\.jsx?$/,
                 exclude: /node_modules/,
                 use: {
                     loader: "babel-loader",
@@ -28,11 +30,25 @@ export default {
             },
             {
                 test: /\.css$/,
-                use: ["style-loader", "css-loader"],
+                use: [
+                    "style-loader",
+                    "css-loader",
+                    {
+                        loader: "postcss-loader",
+                        options: {
+                            postcssOptions: {
+                                plugins: [
+                                    tailwindcss("./tailwind.config.js"),
+                                    autoprefixer,
+                                ],
+                            },
+                        },
+                    },
+                ],
             },
         ],
     },
     resolve: {
-        extensions: [".js", ".jsx"], // add .jsx here
+        extensions: [".js", ".jsx"],
     },
 }
