@@ -1,0 +1,6 @@
+{
+    "watch": ["backend"],
+    "ext": "js,json",
+    "ignore": ["game", "public"],
+    "quiet": true
+}
