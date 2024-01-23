@@ -8,7 +8,7 @@ const App = () => {
     return (
         <Router>
             <Navbar />
-            <div className="container mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
+            <div className="container mx-auto min-h-[90vh] max-w-7xl px-2 sm:px-6 lg:px-8">
                 <Routes>
                     <Route path="/" element={<div>Hello</div>} />
                     <Route path="/products" element={<Products />} />

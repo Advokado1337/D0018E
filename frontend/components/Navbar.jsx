@@ -59,7 +59,7 @@ const Navbar = () => {
                             </svg>
                         </Link>
                         <div className="text-gray-400 ml-2">
-                            0<span className="text-green-400">$</span>
+                            0<span className="text-green-400 ml-1">$</span>
                         </div>
                     </div>
                 </div>
