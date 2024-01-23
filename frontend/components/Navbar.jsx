@@ -1,21 +1,19 @@
-import { Link } from "react-router-dom"
+import { Link, useLocation } from "react-router-dom"
 import React from "react"
 
 const Navbar = () => {
+    const { pathname } = useLocation()
+    const activeRouteClasses = (route) => {
+        if (route === pathname) {
+            return "bg-gray-900 text-white"
+        }
+        return "text-gray-300 hover:bg-gray-700 hover:text-white"
+    }
+
     return (
         <nav className="bg-gray-800">
             <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
                 <div className="relative flex h-16 items-center justify-between">
-                    <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
-                        <button
-                            type="button"
-                            className="relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
-                            aria-controls="mobile-menu"
-                            aria-expanded="false"
-                        >
-                            <span className="absolute -inset-0.5"></span>
-                        </button>
-                    </div>
                     <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
                         <div className="flex flex-shrink-0 items-center">
                             <img
@@ -27,18 +25,41 @@ const Navbar = () => {
                             <div className="flex space-x-4">
                                 <Link
                                     to="/"
-                                    className="bg-gray-900 text-white rounded-md px-3 py-2 text-sm font-medium"
-                                    aria-current="page"
+                                    className={`${activeRouteClasses(
+                                        "/"
+                                    )} rounded-md px-3 py-2 text-sm font-medium`}
                                 >
                                     Home
                                 </Link>
                                 <Link
-                                    to="products"
-                                    className="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
+                                    to="/products"
+                                    className={`${activeRouteClasses(
+                                        "/products"
+                                    )} rounded-md px-3 py-2 text-sm font-medium`}
                                 >
                                     Products
                                 </Link>
                             </div>
+                        </div>
+                    </div>
+                    <div className="flex">
+                        <Link className="hover:cursor-pointer" to="/checkout">
+                            <svg
+                                className="h-6 w-6 flex-shrink-0 text-gray-400 group-hover:text-gray-500"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                strokeWidth="1.5"
+                                stroke="currentColor"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
+                                />
+                            </svg>
+                        </Link>
+                        <div className="text-gray-400 ml-2">
+                            0<span className="text-green-400">$</span>
                         </div>
                     </div>
                 </div>
