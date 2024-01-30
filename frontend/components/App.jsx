@@ -1,6 +1,7 @@
 import React from "react"
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom"
 import Products from "./Products.jsx"
+import Product from "./Product.jsx"
 import Navbar from "./Navbar.jsx"
 import Footer from "./Footer.jsx"
 
@@ -12,6 +13,8 @@ const App = () => {
                 <Routes>
                     <Route path="/" element={<div>Hello</div>} />
                     <Route path="/products" element={<Products />} />
+                    <Route path="/product/:id" element={<Product />} />
+                    <Route path="*" element={<div>Not Found</div>} />
                 </Routes>
             </div>
             <Footer />
