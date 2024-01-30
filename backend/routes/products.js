@@ -32,15 +32,11 @@ export default {
         if (searchConditions) conditions.push(`(${searchConditions})`)
         if (conditions.length) sqlQuery += ` WHERE ${conditions.join(" AND ")}`
 
-        console.log(query.sort)
-
         if (query.sort === "price_asc") sqlQuery += " ORDER BY price"
         else if (query.sort === "price_desc") sqlQuery += " ORDER BY price DESC"
         else if (query.sort === "new") sqlQuery += " ORDER BY product_id DESC"
 
         sqlQuery += ";"
-
-        console.log(sqlQuery)
 
         database.query(sqlQuery, (err, result) => {
             if (err) return console.error(err)

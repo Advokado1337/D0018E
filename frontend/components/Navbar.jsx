@@ -43,7 +43,7 @@ const Navbar = () => {
                         </div>
                     </div>
                     <div className="flex">
-                        <Link className="hover:cursor-pointer" to="/checkout">
+                        <Link className="hover:cursor-pointer" to="/cart">
                             <svg
                                 className="h-6 w-6 flex-shrink-0 text-gray-400 group-hover:text-gray-500"
                                 fill="none"
