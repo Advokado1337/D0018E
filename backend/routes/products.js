@@ -5,7 +5,7 @@ export default {
         const sizes = query.sizes?.split(",") ?? []
         const colors = query.colors?.split(",") ?? []
         const search = query.search ?? ""
-        const minPrice = Number(query.minPrice) ?? 0
+        const minPrice = Number(query.minPrice) ? Number(query.minPrice) : 0
         const maxPrice = Number(query.maxPrice)
             ? Number(query.maxPrice)
             : 999999

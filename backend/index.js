@@ -1,10 +1,13 @@
 import products from "./routes/products.js"
 import product from "./routes/product.js"
+import cart from "./routes/cart.js"
 import express from "express"
 import dotenv from "dotenv"
 import * as url from "url"
 import mysql from "mysql"
 import path from "path"
+import cookieParser from "cookie-parser"
+import { v4 as uuidv4 } from "uuid"
 
 dotenv.config()
 
@@ -29,6 +32,25 @@ const start = () => {
         console.log("Connected to database")
 
         app.use(express.static("public"))
+        app.use(express.json())
+        app.use(cookieParser("secret"))
+
+        app.use((req, res, next) => {
+            if (!req.signedCookies.session_id) {
+                const id = uuidv4()
+                res.cookie("session_id", id, {
+                    signed: true,
+                    httpOnly: true,
+                    maxAge: 1000 * 60 * 60 * 24 * 7,
+                })
+
+                req.session_id = id
+                return next()
+            }
+            req.session_id = req.signedCookies.session_id
+            next()
+        })
+
         app.use((req, res, next) => {
             req.database = connection
             next()
@@ -36,6 +58,10 @@ const start = () => {
 
         app.get("/api/products", products.get)
         app.get("/api/product/:id", product.get)
+        app.put("/api/product/:id", product.put)
+        app.delete("/api/product/:id", product.delete)
+        app.post("/api/cart", cart.post)
+        app.get("/api/cart", cart.get)
         app.get("*", (req, res) => {
             res.sendFile("index.html", options)
         })
