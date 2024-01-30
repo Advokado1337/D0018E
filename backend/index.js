@@ -1,4 +1,5 @@
 import products from "./routes/products.js"
+import product from "./routes/product.js"
 import express from "express"
 import dotenv from "dotenv"
 import * as url from "url"
@@ -34,6 +35,7 @@ const start = () => {
         })
 
         app.get("/api/products", products.get)
+        app.get("/api/product/:id", product.get)
         app.get("*", (req, res) => {
             res.sendFile("index.html", options)
         })

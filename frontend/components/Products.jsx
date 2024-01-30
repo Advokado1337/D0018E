@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react"
+import {Link} from "react-router-dom"
 
 const Products = () => {
     const sortOptions = {
@@ -222,7 +223,8 @@ const Products = () => {
                     {products.length ? (
                         <div className="mt-6 w-full grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
                             {products.map((product) => (
-                                <div
+                               <Link to={"/product/"+product.product_id}>   
+                                <div 
                                     className="group relative"
                                     key={product.product_id}
                                 >
@@ -252,6 +254,7 @@ const Products = () => {
                                         </p>
                                     </div>
                                 </div>
+                                </Link>
                             ))}
                         </div>
                     ) : (
