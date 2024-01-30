@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react"
-import {Link} from "react-router-dom"
+import { Link } from "react-router-dom"
 
 const Products = () => {
     const sortOptions = {
@@ -100,9 +100,7 @@ const Products = () => {
                 onSubmit={(e) => e.preventDefault()}
             >
                 <div className="flex flex-col">
-                    <label className="font-medium mb-2 font-semibold">
-                        Search
-                    </label>
+                    <label className="mb-2 font-semibold">Search</label>
                     <input
                         defaultValue={form.search}
                         name="search"
@@ -111,9 +109,7 @@ const Products = () => {
                 </div>
                 <div className="flex items-center pt-4 mt-8 border-t border-gray-300">
                     <div className="w-full">
-                        <label className="font-medium font-semibold">
-                            Min price
-                        </label>
+                        <label className="font-semibold">Min price</label>
                         <input
                             defaultValue={form.minPrice}
                             name="minPrice"
@@ -123,9 +119,7 @@ const Products = () => {
                     </div>
                     <div className="mx-4 text-xl font-bold mt-6">-</div>
                     <div className="w-full">
-                        <label className="font-medium font-semibold">
-                            Max price
-                        </label>
+                        <label className="font-semibold">Max price</label>
                         <input
                             defaultValue={form.maxPrice}
                             name="maxPrice"
@@ -135,7 +129,7 @@ const Products = () => {
                     </div>
                 </div>
                 <div className="flex flex-col mt-8 pt-4 border-t border-gray-300">
-                    <label className="font-medium font-semibold">Color</label>
+                    <label className="font-semibold">Color</label>
                     {Object.keys(form.colors).map((color, i) => (
                         <div className="mt-4 flex items-center" key={i}>
                             <input
@@ -151,7 +145,7 @@ const Products = () => {
                     ))}
                 </div>
                 <div className="flex flex-col mt-8 pt-4 border-t border-gray-300">
-                    <label className="font-medium font-semibold">Sizes</label>
+                    <label className="font-semibold">Sizes</label>
                     {Object.keys(form.sizes).map((size, i) => (
                         <div className="mt-4 flex items-center" key={i}>
                             <input
@@ -223,37 +217,35 @@ const Products = () => {
                     {products.length ? (
                         <div className="mt-6 w-full grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
                             {products.map((product) => (
-                               <Link to={"/product/"+product.product_id}>   
-                                <div 
-                                    className="group relative"
+                                <Link
+                                    to={"/product/" + product.product_id}
                                     key={product.product_id}
                                 >
-                                    <div className="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-md bg-gray-200 lg:aspect-none group-hover:opacity-75 lg:h-80">
-                                        <img
-                                            src={
-                                                "/images/products/" +
-                                                product.image
-                                            }
-                                            className="h-full w-full object-cover object-center lg:h-full lg:w-full"
-                                        />
-                                    </div>
-                                    <div className="mt-4 flex justify-between">
-                                        <div>
-                                            <h3 className="text-sm text-gray-700">
-                                                <a href="#">
+                                    <div className="group relative">
+                                        <div className="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-md bg-gray-200 lg:aspect-none group-hover:opacity-75 lg:h-80">
+                                            <img
+                                                src={
+                                                    "/images/products/" +
+                                                    product.image
+                                                }
+                                                className="h-full w-full object-cover object-center lg:h-full lg:w-full"
+                                            />
+                                        </div>
+                                        <div className="mt-4 flex justify-between">
+                                            <div>
+                                                <h3 className="text-sm text-gray-700">
                                                     <span className="absolute inset-0"></span>
                                                     {product.label}
-                                                </a>
-                                            </h3>
-                                            <p className="mt-1 text-sm capitalize text-gray-500">
-                                                {product.label}
+                                                </h3>
+                                                <p className="mt-1 text-sm capitalize text-gray-500">
+                                                    {product.label}
+                                                </p>
+                                            </div>
+                                            <p className="text-sm font-medium text-gray-900">
+                                                ${product.price}
                                             </p>
                                         </div>
-                                        <p className="text-sm font-medium text-gray-900">
-                                            ${product.price}
-                                        </p>
                                     </div>
-                                </div>
                                 </Link>
                             ))}
                         </div>
