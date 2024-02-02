@@ -1,0 +1,23 @@
+### Get Products
+
+GET http://localhost:3000/api/products
+
+### With parameters
+
+GET http://localhost:3000/api/products?label=t-shirt&colors=red&sizes=XL&minPrice=100&maxPrice=200
+
+### Get product by id
+
+GET http://localhost:3000/api/product/1
+
+### Update product
+
+PUT http://localhost:3000/api/product/1
+Content-Type: application/json
+
+{
+    "price": 150
+}
+
+### Delete product
+DELETE http://localhost:3000/api/product/3

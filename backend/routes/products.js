@@ -2,48 +2,63 @@ export default {
     get: (req, res) => {
         const { database, query } = req
 
-        const sizes = query.sizes?.split(",") ?? []
-        const colors = query.colors?.split(",") ?? []
-        const search = query.search ?? ""
-        const minPrice = Number(query.minPrice) ? Number(query.minPrice) : 0
-        const maxPrice = Number(query.maxPrice)
-            ? Number(query.maxPrice)
-            : 999999
+        const params = []
+        const conditions = []
 
-        const colorConditions = colors
-            .map((color) => `JSON_CONTAINS(colors, '"${color}"')`)
-            .join(" OR ")
-        const sizeConditions = sizes
-            .map((size) => `JSON_CONTAINS(sizes, '"${size}"')`)
-            .join(" OR ")
-        const searchConditions = search
-            .split(" ")
-            .map((word) => `label LIKE '%${word}%'`)
-            .join(" OR ")
+        if (query.minPrice || query.maxPrice) {
+            conditions.push(`price BETWEEN ? AND ?`)
+            params.push(
+                Number(query.minPrice) || 0,
+                Number(query.maxPrice) || 999999
+            )
+        }
+
+        if (query.colors) {
+            const colors = query.colors.split(",")
+            colors.forEach((color) => {
+                conditions.push(`JSON_CONTAINS(colors, ?)`)
+                params.push(JSON.stringify([color]))
+            })
+        }
+
+        if (query.sizes) {
+            const sizes = query.sizes.split(",")
+            sizes.forEach((size) => {
+                conditions.push(`JSON_CONTAINS(sizes, ?)`)
+                params.push(JSON.stringify([size]))
+            })
+        }
+
+        if (query.search) {
+            const searchTerms = query.search.split(" ")
+            searchTerms.forEach((term) => {
+                conditions.push(`label LIKE ?`)
+                params.push(`%${term}%`)
+            })
+        }
 
         let sqlQuery = "SELECT * FROM product"
+        if (conditions.length) {
+            sqlQuery += ` WHERE ${conditions.join(" AND ")}`
+        }
 
-        const conditions = [`price BETWEEN ${minPrice} AND ${maxPrice}`]
+        switch (query.sort) {
+            case "price_asc":
+                sqlQuery += " ORDER BY price ASC"
+                break
+            case "price_desc":
+                sqlQuery += " ORDER BY price DESC"
+                break
+            case "new":
+                sqlQuery += " ORDER BY product_id DESC"
+                break
+        }
 
-        if (colorConditions && query.colors.length)
-            conditions.push(`(${colorConditions})`)
-        if (sizeConditions && query.sizes.length)
-            conditions.push(`(${sizeConditions})`)
-        if (searchConditions) conditions.push(`(${searchConditions})`)
-        if (conditions.length) sqlQuery += ` WHERE ${conditions.join(" AND ")}`
-
-        console.log(query.sort)
-
-        if (query.sort === "price_asc") sqlQuery += " ORDER BY price"
-        else if (query.sort === "price_desc") sqlQuery += " ORDER BY price DESC"
-        else if (query.sort === "new") sqlQuery += " ORDER BY product_id DESC"
-
-        sqlQuery += ";"
-
-        console.log(sqlQuery)
-
-        database.query(sqlQuery, (err, result) => {
-            if (err) return console.error(err)
+        database.query(sqlQuery, params, (err, result) => {
+            if (err) {
+                console.error(err)
+                return res.sendStatus(500)
+            }
             res.send(result)
         })
     },
