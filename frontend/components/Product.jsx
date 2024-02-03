@@ -7,6 +7,7 @@ const Product = () => {
     const [product, setProduct] = useState()
     const [selectedColor, setSelectedColor] = useState()
     const [selectedSize, setSelectedSize] = useState()
+    const [addToCartThrottle, setAddToCartThrottle] = useState(false)
     const navigate = useNavigate()
 
     useEffect(() => {
@@ -62,14 +63,22 @@ const Product = () => {
     }
 
     const handleAddToCart = () => {
-        fetch("/api/cart/add", {
+        if (addToCartThrottle) return
+        setAddToCartThrottle(true)
+        fetch("/api/cart", {
             method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
             body: JSON.stringify({
-                product_id: product.product_id,
+                product_id: id,
                 color: selectedColor,
                 size: selectedSize,
             }),
         })
+        setTimeout(() => {
+            setAddToCartThrottle(false)
+        }, 1000)
     }
 
     if (!product) return <div>Loading...</div>
@@ -139,7 +148,12 @@ const Product = () => {
                     <p className="mt-2 text-gray-700">{product.description}</p>
                     <button
                         onClick={handleAddToCart}
-                        className="mt-4 bg-indigo-500 border border-indigo500 py-3 rounded-md text-white justify-center flex"
+                        className={
+                            "mt-4 py-3 rounded-md text-white justify-center flex w-full" +
+                            (addToCartThrottle
+                                ? " cursor-not-allowed bg-gray-400"
+                                : " bg-indigo-500 hover:bg-indigo-600")
+                        }
                     >
                         Add to cart
                     </button>

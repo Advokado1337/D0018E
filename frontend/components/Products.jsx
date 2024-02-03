@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
+import Loader from "./Loader.jsx"
 
 const Products = () => {
     const sortOptions = {
@@ -12,6 +13,8 @@ const Products = () => {
         open: false,
         selected: null,
     })
+
+    const [fetching, setFetching] = useState(true)
 
     const [form, setForm] = useState({
         search: "",
@@ -47,6 +50,7 @@ const Products = () => {
     }, [form, sortDialog.selected])
 
     const fetchProducts = () => {
+        setFetching(true)
         const colors = Object.keys(form.colors).filter(
             (color) => form.colors[color]
         )
@@ -68,6 +72,7 @@ const Products = () => {
             .then((res) => res.json())
             .then((data) => {
                 setProducts(data)
+                setFetching(false)
             })
     }
 
@@ -214,45 +219,55 @@ const Products = () => {
                     </div>
                 </div>
                 <div className="w-full pl-8 mt-12 flex">
-                    {products.length ? (
-                        <div className="mt-6 w-full grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
-                            {products.map((product) => (
-                                <Link
-                                    to={"/product/" + product.product_id}
-                                    key={product.product_id}
-                                >
-                                    <div className="group relative">
-                                        <div className="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-md bg-gray-200 lg:aspect-none group-hover:opacity-75 lg:h-80">
-                                            <img
-                                                src={
-                                                    "/images/products/" +
-                                                    product.image
-                                                }
-                                                className="h-full w-full object-cover object-center lg:h-full lg:w-full"
-                                            />
-                                        </div>
-                                        <div className="mt-4 flex justify-between">
-                                            <div>
-                                                <h3 className="text-sm text-gray-700">
-                                                    <span className="absolute inset-0"></span>
-                                                    {product.label}
-                                                </h3>
-                                                <p className="mt-1 text-sm capitalize text-gray-500">
-                                                    {product.label}
-                                                </p>
-                                            </div>
-                                            <p className="text-sm font-medium text-gray-900">
-                                                ${product.price}
-                                            </p>
-                                        </div>
-                                    </div>
-                                </Link>
-                            ))}
+                    {fetching && !products.length ? (
+                        <div className="w-full mt-24 flex justify-center items-center">
+                            <Loader message="Loading cart..." />
                         </div>
                     ) : (
-                        <div className="w-full text-center mt-6">
-                            Couldn't find any products
-                        </div>
+                        <>
+                            {products.length ? (
+                                <div className="mt-6 w-full grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
+                                    {products.map((product) => (
+                                        <Link
+                                            to={
+                                                "/product/" + product.product_id
+                                            }
+                                            key={product.product_id}
+                                        >
+                                            <div className="group relative">
+                                                <div className="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-md bg-gray-200 lg:aspect-none group-hover:opacity-75 lg:h-80">
+                                                    <img
+                                                        src={
+                                                            "/images/products/" +
+                                                            product.image
+                                                        }
+                                                        className="h-full w-full object-cover object-center lg:h-full lg:w-full"
+                                                    />
+                                                </div>
+                                                <div className="mt-4 flex justify-between">
+                                                    <div>
+                                                        <h3 className="text-sm text-gray-700">
+                                                            <span className="absolute inset-0"></span>
+                                                            {product.label}
+                                                        </h3>
+                                                        <p className="mt-1 text-sm capitalize text-gray-500">
+                                                            {product.label}
+                                                        </p>
+                                                    </div>
+                                                    <p className="text-sm font-medium text-gray-900">
+                                                        ${product.price}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </Link>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="w-full text-center mt-6">
+                                    Couldn't find any products
+                                </div>
+                            )}
+                        </>
                     )}
                 </div>
             </div>
