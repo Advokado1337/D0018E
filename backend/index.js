@@ -1,6 +1,7 @@
 import products from "./routes/products.js"
 import product from "./routes/product.js"
 import cart from "./routes/cart.js"
+import inventory from "./routes/inventory.js"
 import express from "express"
 import dotenv from "dotenv"
 import * as url from "url"
@@ -63,6 +64,9 @@ const start = () => {
         app.post("/api/product", product.post)
         app.post("/api/cart", cart.post)
         app.get("/api/cart", cart.get)
+        app.get("/api/inventory/:id", inventory.get)
+        app.post("/api/inventory/:id", inventory.post)
+        app.put("/api/inventory/:id", inventory.put)
         app.get("*", (req, res) => {
             res.sendFile("index.html", options)
         })
