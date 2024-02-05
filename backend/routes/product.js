@@ -98,15 +98,45 @@ export default {
     get: (req, res) => {
         const { database, params } = req
 
-        database.query(
-            "SELECT * FROM product WHERE product_id = ?",
+        const sql = `
+            SELECT p.*, i.inventory_id, i.color, i.size, i.quantity
+            FROM product p
+            LEFT JOIN inventory i ON p.product_id = i.product_id
+            WHERE p.product_id = ?;
+        `
 
-            [params.id],
-            (err, result) => {
-                if (err) return res.sendStatus(500)
-                if (result.length) return res.send(result[0])
-                res.send(result)
+        database.query(sql, [params.id], (err, result) => {
+            if (err) {
+                console.log(err)
+                return res.sendStatus(500)
             }
-        )
+            if (result.length) {
+                const product = {
+                    product_id: result[0].product_id,
+                    name: result[0].name,
+                    description: result[0].description,
+                    price: result[0].price,
+                    colors: JSON.parse(result[0].colors),
+                    sizes: JSON.parse(result[0].sizes),
+                    image: result[0].image,
+                    inventories: [],
+                }
+
+                if (result[0].inventory_id) {
+                    result.forEach((row) => {
+                        product.inventories.push({
+                            inventory_id: row.inventory_id,
+                            color: row.color,
+                            size: row.size,
+                            quantity: row.quantity,
+                        })
+                    })
+                }
+
+                return res.send(product)
+            } else {
+                res.sendStatus(404)
+            }
+        })
     },
 }

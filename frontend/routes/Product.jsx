@@ -15,8 +15,6 @@ const Product = () => {
             .then((res) => res.json())
             .then((data) => {
                 if (!data || !Object.keys(data).length) return navigate("/404")
-                data.colors = JSON.parse(data.colors)
-                data.sizes = JSON.parse(data.sizes)
                 setProduct(data)
                 setSelectedColor(data.colors[0])
                 setSelectedSize(data.sizes[0])
