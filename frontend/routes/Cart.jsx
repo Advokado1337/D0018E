@@ -31,7 +31,7 @@ const Cart = () => {
                     {cart.map((item) => (
                         <div
                             className="w-full h-48 border-b border-gray-300 py-8 flex"
-                            key={item.cart_item_id}
+                            key={item.cart_id}
                         >
                             <div className="flex w-full">
                                 <div
@@ -62,7 +62,7 @@ const Cart = () => {
                                             <path
                                                 fill="none"
                                                 stroke="green"
-                                                stroke-width="10"
+                                                strokeWidth="10"
                                                 d="M 10,50 l 20,20 l 40,-40"
                                             />
                                         </svg>

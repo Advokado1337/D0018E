@@ -2,7 +2,7 @@ export default {
     get: (req, res) => {
         const { database, session_id } = req
         database.query(
-            "SELECT * FROM cart_item WHERE session_id = ?",
+            "SELECT ci.*, p.* FROM cart_item ci JOIN product p ON ci.product_id = p.product_id WHERE ci.session_id = ?",
             [session_id],
             (err, result) => {
                 console.log(err)

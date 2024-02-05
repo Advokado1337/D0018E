@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
-import Loader from "./Loader.jsx"
+import Loader from "../components/Loader.jsx"
 
 const Products = () => {
     const sortOptions = {
