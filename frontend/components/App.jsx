@@ -1,5 +1,6 @@
 import React from "react"
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
+import AdminProducts from "../routes/AdminProducts.jsx"
 import AdminPanel from "../routes/AdminPanel.jsx"
 import Products from "../routes/Products.jsx"
 import Product from "../routes/Product.jsx"
@@ -91,7 +92,7 @@ const App = () => {
                     path="/admin/products"
                     element={
                         <AdminLayout>
-                            <AdminPanel />
+                            <AdminProducts />
                         </AdminLayout>
                     }
                 />
