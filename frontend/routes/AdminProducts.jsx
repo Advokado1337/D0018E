@@ -9,10 +9,18 @@ const AdminProducts = () => {
         description: "",
         sizes: [],
         colors: [],
+        inventories: [],
     })
     const [dialog, setDialog] = useState(false)
     const [editing, setEditing] = useState(null)
-    const [isLoading, setIsLoading] = useState(true)
+    const [isLoadingProducts, setIsLoadingProducts] = useState(true)
+    const [newInventory, setNewInventory] = useState({
+        size: "",
+        color: "",
+        quantity: 0,
+        open: false,
+    })
+    const [isLoadingProduct, setIsLoadingProduct] = useState(true)
 
     useEffect(() => {
         fetchProducts()
@@ -28,13 +36,54 @@ const AdminProducts = () => {
                 colors: JSON.parse(product.colors),
             }))
         )
-        setIsLoading(false)
+        setIsLoadingProducts(false)
     }
 
     const handleDialogEdit = (e) => {
         setEditProduct({
             ...editProduct,
             [e.target.name]: e.target.value,
+        })
+    }
+
+    const handleCreateInventory = () => {
+        if (
+            !newInventory.size ||
+            !newInventory.color ||
+            !newInventory.quantity ||
+            newInventory.size === "Size" ||
+            newInventory.color === "Color"
+        ) {
+            return alert("Please fill all fields")
+        }
+
+        const isDuplicate = editProduct.inventories.find(
+            (inventory) =>
+                inventory.size === newInventory.size &&
+                inventory.color === newInventory.color
+        )
+
+        if (isDuplicate) {
+            return alert("Inventory already exists")
+        }
+
+        setEditProduct({
+            ...editProduct,
+            inventories: [
+                ...editProduct.inventories,
+                {
+                    size: newInventory.size,
+                    color: newInventory.color,
+                    quantity: newInventory.quantity,
+                },
+            ],
+        })
+
+        setNewInventory({
+            size: "",
+            color: "",
+            quantity: 0,
+            open: false,
         })
     }
 
@@ -48,7 +97,7 @@ const AdminProducts = () => {
         })
         setEditing(null)
         setDialog(false)
-        setIsLoading(true)
+        setIsLoadingProducts(true)
         fetchProducts()
     }
 
@@ -76,7 +125,7 @@ const AdminProducts = () => {
         })
 
         setDialog(false)
-        setIsLoading(true)
+        setIsLoadingProducts(true)
         fetchProducts()
     }
 
@@ -87,6 +136,7 @@ const AdminProducts = () => {
             description: "",
             sizes: [],
             colors: [],
+            inventories: [],
         })
         setEditing(null)
         setDialog(true)
@@ -99,8 +149,16 @@ const AdminProducts = () => {
 
         setEditing(null)
         setDialog(false)
-        setIsLoading(true)
+        setIsLoadingProducts(true)
         fetchProducts()
+    }
+
+    const fetchProduct = async (id) => {
+        setIsLoadingProduct(true)
+        const response = await fetch("/api/product/" + id)
+        const data = await response.json()
+        setEditProduct(data)
+        setIsLoadingProduct(false)
     }
 
     const colors = {
@@ -160,7 +218,7 @@ const AdminProducts = () => {
                         Create Product
                     </button>
                 </div>
-                {isLoading ? (
+                {isLoadingProducts ? (
                     <div className="w-full mt-24 flex justify-center items-center">
                         <Loader message="Loading cart..." />
                     </div>
@@ -176,8 +234,9 @@ const AdminProducts = () => {
                                         : " border-b-2 border-gray-200")
                                 }
                                 onClick={() => {
+                                    setIsLoadingProduct(true)
+                                    fetchProduct(product.product_id)
                                     setEditing(product.product_id)
-                                    setEditProduct(product)
                                     setDialog(true)
                                 }}
                             >
@@ -256,178 +315,396 @@ const AdminProducts = () => {
                 )}
             </div>
             {dialog && (
-                <form
-                    className="max-w-[600px] bg-white min-h-full p-8 border-l-2 border-gray-200"
-                    onSubmit={handleCreateProduct}
-                >
-                    <div className="flex justify-between items-center">
-                        <h2 className="font-semibold text-xl">
-                            {editing ? "Edit Product" : "Create Product"}
-                        </h2>
-                        <div className="flex justify-end">
-                            <button
-                                onClick={() => {
-                                    setDialog(false)
-                                    setEditing(null)
-                                }}
-                                className="text-gray-400 bg-red-500 hover:bg-red-400 rounded-md p-2 hover:text-gray-600"
-                            >
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    viewBox="0 0 20 20"
-                                    fill="white"
-                                    className="w-6 h-6"
-                                >
-                                    <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z"></path>
-                                </svg>
-                            </button>
+                <div className="max-w-[550px] w-full bg-white min-h-full p-8 border-l-2 border-gray-200">
+                    {isLoadingProduct && editing ? (
+                        <div className="w-full mt-24 flex justify-center items-center">
+                            <Loader message="Loading product..." />
                         </div>
-                    </div>
-                    <div className="bg-gray-300 rounded-md p-4 mt-4">
-                        <h3 className="font-semibold text-gray-500">Label</h3>
-                        <input
-                            onChange={handleDialogEdit}
-                            name="label"
-                            value={editProduct.label}
-                            type="text"
-                            className="w-full p-4 rounded-md mt-2 border-none outline-none ring-2 ring-gray-400 focus:ring-indigo-500"
-                        />
-                    </div>
-                    <div className="bg-gray-300 rounded-md p-4 mt-4">
-                        <h3 className="font-semibold text-gray-500">Price</h3>
-                        <input
-                            onChange={handleDialogEdit}
-                            name="price"
-                            type="number"
-                            value={editProduct.price}
-                            className="w-full p-4 rounded-md mt-2 border-none outline-none ring-2 ring-gray-400 focus:ring-indigo-500"
-                        />
-                    </div>
-                    <div className="bg-gray-300 rounded-md p-4 mt-4">
-                        <h3 className="font-semibold text-gray-500">
-                            Description
-                        </h3>
-                        <textarea
-                            onChange={handleDialogEdit}
-                            name="description"
-                            type="text"
-                            value={editProduct.description}
-                            className="w-full min-h-[200px] p-4 rounded-md mt-2 border-none outline-none ring-2 ring-gray-400 focus:ring-indigo-500"
-                        />
-                    </div>
-                    <div className="bg-gray-300 rounded-md p-4 mt-4">
-                        <h3 className="font-semibold text-gray-500">Sizes</h3>
-                        <div className="flex mt-2">
-                            {["XS", "S", "M", "L", "XL", "XXL"].map((size) => (
-                                <div
-                                    key={size}
-                                    className={
-                                        "border cursor-pointer rounded-md py-3 px-6 border-gray-400 mr-2  hover:border-indigo-500 " +
-                                        (editProduct.sizes.includes(size)
-                                            ? "bg-indigo-500 text-white border-indigo-500"
-                                            : "")
-                                    }
-                                    onClick={() => {
-                                        if (editProduct.sizes.includes(size)) {
-                                            setEditProduct({
-                                                ...editProduct,
-                                                sizes: editProduct.sizes.filter(
-                                                    (s) => s !== size
-                                                ),
-                                            })
-                                        } else {
-                                            setEditProduct({
-                                                ...editProduct,
-                                                sizes: [
-                                                    ...editProduct.sizes,
-                                                    size,
-                                                ],
-                                            })
-                                        }
-                                    }}
-                                >
-                                    {size}
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                    <div className="bg-gray-300 rounded-md p-4 mt-4">
-                        <h3 className="font-semibold text-gray-500">Colors</h3>
-                        <div className="mt-2">
-                            {Object.keys(colors).map((color) => (
-                                <div
-                                    className="inline-block mr-2 cursor-pointer hover:opacity-80"
-                                    key={color}
-                                    onClick={() => {
-                                        if (
-                                            editProduct.colors.includes(color)
-                                        ) {
-                                            setEditProduct({
-                                                ...editProduct,
-                                                colors: editProduct.colors.filter(
-                                                    (c) => c !== color
-                                                ),
-                                            })
-                                        } else {
-                                            setEditProduct({
-                                                ...editProduct,
-                                                colors: [
-                                                    ...editProduct.colors,
-                                                    color,
-                                                ],
-                                            })
-                                        }
-                                    }}
-                                >
-                                    <div
-                                        className={
-                                            "w-10 h-10 flex justify-center items-center rounded-full " +
-                                            (editProduct.colors.includes(color)
-                                                ? colors[color].border +
-                                                  " border-2"
-                                                : "")
-                                        }
+                    ) : (
+                        <>
+                            <div className="flex justify-between items-center">
+                                <h2 className="font-semibold text-xl">
+                                    {editing
+                                        ? "Edit Product"
+                                        : "Create Product"}
+                                </h2>
+                                <div className="flex justify-end">
+                                    <button
+                                        onClick={() => {
+                                            setDialog(false)
+                                            setEditing(null)
+                                        }}
+                                        className="text-gray-400 bg-red-500 hover:bg-red-400 rounded-md p-2 hover:text-gray-600"
                                     >
-                                        <div
-                                            className={
-                                                "w-8 h-8 rounded-full " +
-                                                colors[color].bg +
-                                                (color === "white"
-                                                    ? " border border-gray-400"
-                                                    : "")
-                                            }
-                                        ></div>
-                                    </div>
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            viewBox="0 0 20 20"
+                                            fill="white"
+                                            className="w-6 h-6"
+                                        >
+                                            <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z"></path>
+                                        </svg>
+                                    </button>
                                 </div>
-                            ))}
-                        </div>
-                    </div>
-                    <div className="w-full flex">
-                        {editing ? (
-                            <>
-                                <button
-                                    className="bg-indigo-500 hover:bg-indigo-400 text-white rounded-md p-4 mt-4 ml-auto"
-                                    onClick={handleEditProduct}
-                                >
-                                    Edit
-                                </button>
-                                <button
-                                    className="bg-red-500 hover:bg-red-400 text-white rounded-md p-4 mt-4 ml-4"
-                                    onClick={handleDeleteProduct}
-                                >
-                                    Delete
-                                </button>
-                            </>
-                        ) : (
-                            <button
-                                className="bg-indigo-500 hover:bg-indigo-400 text-white rounded-md p-4 mt-4 ml-auto"
-                                type="submit"
-                            >
-                                Create
-                            </button>
-                        )}
-                    </div>
-                </form>
+                            </div>
+                            <div className="bg-gray-300 rounded-md p-4 mt-4">
+                                <h3 className="font-semibold text-gray-500">
+                                    Label
+                                </h3>
+                                <input
+                                    onChange={handleDialogEdit}
+                                    name="label"
+                                    value={editProduct.label}
+                                    type="text"
+                                    className="w-full p-4 rounded-md mt-2 border-none outline-none ring-2 ring-gray-400 focus:ring-indigo-500"
+                                />
+                            </div>
+                            <div className="bg-gray-300 rounded-md p-4 mt-4">
+                                <h3 className="font-semibold text-gray-500">
+                                    Price
+                                </h3>
+                                <input
+                                    onChange={handleDialogEdit}
+                                    name="price"
+                                    type="number"
+                                    value={editProduct.price}
+                                    className="w-full p-4 rounded-md mt-2 border-none outline-none ring-2 ring-gray-400 focus:ring-indigo-500"
+                                />
+                            </div>
+                            <div className="bg-gray-300 rounded-md p-4 mt-4">
+                                <h3 className="font-semibold text-gray-500">
+                                    Description
+                                </h3>
+                                <textarea
+                                    onChange={handleDialogEdit}
+                                    name="description"
+                                    type="text"
+                                    value={editProduct.description}
+                                    className="w-full min-h-[200px] p-4 rounded-md mt-2 border-none outline-none ring-2 ring-gray-400 focus:ring-indigo-500"
+                                />
+                            </div>
+                            <div className="bg-gray-300 rounded-md p-4 mt-4">
+                                <h3 className="font-semibold text-gray-500">
+                                    Sizes
+                                </h3>
+                                <div className="flex mt-2">
+                                    {["XS", "S", "M", "L", "XL", "XXL"].map(
+                                        (size) => (
+                                            <div
+                                                key={size}
+                                                className={
+                                                    "border cursor-pointer rounded-md py-3 px-6 border-gray-400 mr-2  hover:border-indigo-500 " +
+                                                    (editProduct.sizes.includes(
+                                                        size
+                                                    )
+                                                        ? "bg-indigo-500 text-white border-indigo-500"
+                                                        : "")
+                                                }
+                                                onClick={() => {
+                                                    if (
+                                                        editProduct.sizes.includes(
+                                                            size
+                                                        )
+                                                    ) {
+                                                        setEditProduct({
+                                                            ...editProduct,
+                                                            sizes: editProduct.sizes.filter(
+                                                                (s) =>
+                                                                    s !== size
+                                                            ),
+                                                        })
+                                                    } else {
+                                                        setEditProduct({
+                                                            ...editProduct,
+                                                            sizes: [
+                                                                ...editProduct.sizes,
+                                                                size,
+                                                            ],
+                                                        })
+                                                    }
+                                                }}
+                                            >
+                                                {size}
+                                            </div>
+                                        )
+                                    )}
+                                </div>
+                            </div>
+                            <div className="bg-gray-300 rounded-md p-4 mt-4">
+                                <h3 className="font-semibold text-gray-500">
+                                    Colors
+                                </h3>
+                                <div className="mt-2">
+                                    {Object.keys(colors).map((color) => (
+                                        <div
+                                            className="inline-block mr-2 cursor-pointer hover:opacity-80"
+                                            key={color}
+                                            onClick={() => {
+                                                if (
+                                                    editProduct.colors.includes(
+                                                        color
+                                                    )
+                                                ) {
+                                                    setEditProduct({
+                                                        ...editProduct,
+                                                        colors: editProduct.colors.filter(
+                                                            (c) => c !== color
+                                                        ),
+                                                    })
+                                                } else {
+                                                    setEditProduct({
+                                                        ...editProduct,
+                                                        colors: [
+                                                            ...editProduct.colors,
+                                                            color,
+                                                        ],
+                                                    })
+                                                }
+                                            }}
+                                        >
+                                            <div
+                                                className={
+                                                    "w-10 h-10 flex justify-center items-center rounded-full " +
+                                                    (editProduct.colors.includes(
+                                                        color
+                                                    )
+                                                        ? colors[color].border +
+                                                          " border-2"
+                                                        : "")
+                                                }
+                                            >
+                                                <div
+                                                    className={
+                                                        "w-8 h-8 rounded-full " +
+                                                        colors[color].bg +
+                                                        (color === "white"
+                                                            ? " border border-gray-400"
+                                                            : "")
+                                                    }
+                                                ></div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                            <div className="bg-gray-300 rounded-md p-4 mt-4">
+                                <div className="flex items-center w-full">
+                                    <h3 className="font-semibold w-full text-gray-500">
+                                        Inventory
+                                    </h3>
+                                    {!newInventory.open && (
+                                        <button
+                                            className="bg-indigo-500 hover:bg-indigo-400 text-white rounded-md p-2 shrink-0"
+                                            onClick={() =>
+                                                setNewInventory({
+                                                    ...newInventory,
+                                                    open: !newInventory.open,
+                                                })
+                                            }
+                                        >
+                                            New Inventory
+                                        </button>
+                                    )}
+                                </div>
+                                <div className="mt-4">
+                                    {newInventory.open && (
+                                        <div className="flex flex-col p-2 bg-white rounded-md mb-4">
+                                            <div className="flex w-full">
+                                                <div className="flex flex-col w-full pr-8">
+                                                    <div className="text-gray-500">
+                                                        Size
+                                                    </div>
+                                                    <select
+                                                        onChange={(e) => {
+                                                            setNewInventory({
+                                                                ...newInventory,
+                                                                size: e.target
+                                                                    .value,
+                                                            })
+                                                        }}
+                                                        className="w-full m-2 p-2 rounded-md mt-2 border-none outline-none ring-2 ring-gray-400 focus:ring-indigo-500"
+                                                    >
+                                                        <option value="">
+                                                            Size
+                                                        </option>
+                                                        {[
+                                                            "XS",
+                                                            "S",
+                                                            "M",
+                                                            "L",
+                                                            "XL",
+                                                            "XXL",
+                                                        ].map((size) => (
+                                                            <option
+                                                                key={size}
+                                                                value={size}
+                                                            >
+                                                                {size}
+                                                            </option>
+                                                        ))}
+                                                    </select>
+                                                </div>
+                                                <div className="flex flex-col w-full pr-8">
+                                                    <div className="text-gray-500">
+                                                        Color
+                                                    </div>
+                                                    <select
+                                                        onChange={(e) => {
+                                                            setNewInventory({
+                                                                ...newInventory,
+                                                                color: e.target
+                                                                    .value,
+                                                            })
+                                                        }}
+                                                        className="w-full p-2 rounded-md mt-2 border-none outline-none ring-2 ring-gray-400 focus:ring-indigo-500"
+                                                    >
+                                                        <option value="">
+                                                            Color
+                                                        </option>
+                                                        {Object.keys(
+                                                            colors
+                                                        ).map((color) => (
+                                                            <option
+                                                                key={color}
+                                                                value={color}
+                                                            >
+                                                                {color}
+                                                            </option>
+                                                        ))}
+                                                    </select>
+                                                </div>
+                                                <div className="flex flex-col w-full">
+                                                    <div className="text-gray-500">
+                                                        Quantity
+                                                    </div>
+                                                    <input
+                                                        type="number"
+                                                        value={
+                                                            newInventory.quantity
+                                                        }
+                                                        onChange={(e) => {
+                                                            setNewInventory({
+                                                                ...newInventory,
+                                                                quantity:
+                                                                    e.target
+                                                                        .value,
+                                                            })
+                                                        }}
+                                                        className="w-full p-2 rounded-md mt-2 border-none outline-none ring-2 ring-gray-400 focus:ring-indigo-500"
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="flex w-full">
+                                                <button
+                                                    onClick={() =>
+                                                        handleCreateInventory()
+                                                    }
+                                                    className="bg-indigo-500 hover:bg-indigo-400 text-white rounded-md p-2 mt-4 ml-auto"
+                                                >
+                                                    Create
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
+                                    {editProduct.inventories.map(
+                                        (inventory) => (
+                                            <div
+                                                key={inventory.inventory_id}
+                                                className="flex flex-col p-2 bg-white rounded-md mb-4"
+                                            >
+                                                <div className="flex w-full">
+                                                    <div className="flex flex-col w-full">
+                                                        <div className="text-gray-500">
+                                                            Size
+                                                        </div>
+                                                        <div className="h-full flex items-center">
+                                                            {inventory.size}
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex flex-col w-full">
+                                                        <div className="text-gray-500">
+                                                            Color
+                                                        </div>
+                                                        <div className="h-full flex items-center">
+                                                            {inventory.color}
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex flex-col w-full">
+                                                        <div className="text-gray-500">
+                                                            Quantity
+                                                        </div>
+                                                        <input
+                                                            type="number"
+                                                            value={
+                                                                inventory.quantity
+                                                            }
+                                                            onChange={(e) => {
+                                                                setEditProduct({
+                                                                    ...editProduct,
+                                                                    inventories:
+                                                                        editProduct.inventories.map(
+                                                                            (
+                                                                                i
+                                                                            ) =>
+                                                                                i.inventory_id ===
+                                                                                inventory.inventory_id
+                                                                                    ? {
+                                                                                          ...i,
+                                                                                          quantity:
+                                                                                              e
+                                                                                                  .target
+                                                                                                  .value,
+                                                                                      }
+                                                                                    : i
+                                                                        ),
+                                                                })
+                                                            }}
+                                                            className="w-full p-2 rounded-md mt-2 border-none outline-none ring-2 ring-gray-400 focus:ring-indigo-500"
+                                                        />
+                                                    </div>
+                                                </div>
+                                                {/* <div className="flex w-full">
+                                                    <button
+                                                        onClick={() => {}}
+                                                        className="bg-indigo-500 hover:bg-indigo-400 text-white rounded-md p-2 mt-4 ml-auto"
+                                                    >
+                                                        Save
+                                                    </button>
+                                                </div> */}
+                                            </div>
+                                        )
+                                    )}
+                                </div>
+                            </div>
+                            <div className="w-full flex">
+                                {editing ? (
+                                    <>
+                                        <button
+                                            className="bg-indigo-500 hover:bg-indigo-400 text-white rounded-md p-4 mt-4 ml-auto"
+                                            onClick={handleEditProduct}
+                                        >
+                                            Edit
+                                        </button>
+                                        <button
+                                            className="bg-red-500 hover:bg-red-400 text-white rounded-md p-4 mt-4 ml-4"
+                                            onClick={handleDeleteProduct}
+                                        >
+                                            Delete
+                                        </button>
+                                    </>
+                                ) : (
+                                    <button
+                                        className="bg-indigo-500 hover:bg-indigo-400 text-white rounded-md p-4 mt-4 ml-auto"
+                                        type="submit"
+                                        onClick={handleCreateProduct}
+                                    >
+                                        Create
+                                    </button>
+                                )}
+                            </div>
+                        </>
+                    )}
+                </div>
             )}
         </div>
     )
