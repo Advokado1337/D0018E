@@ -31,7 +31,12 @@ const AdminLayout = ({ children }) => {
                         Sign out
                     </button>
                 </div>
-                <div className="w-full p-8">{children}</div>
+                <div
+                    className="w-full bg-gray-100"
+                    style={{ height: "calc(100% - 74px)" }}
+                >
+                    {children}
+                </div>
             </div>
         </div>
     )

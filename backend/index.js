@@ -60,6 +60,7 @@ const start = () => {
         app.get("/api/product/:id", product.get)
         app.put("/api/product/:id", product.put)
         app.delete("/api/product/:id", product.delete)
+        app.post("/api/product", product.post)
         app.post("/api/cart", cart.post)
         app.get("/api/cart", cart.get)
         app.get("*", (req, res) => {

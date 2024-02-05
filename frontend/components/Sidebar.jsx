@@ -19,7 +19,7 @@ const Sidebar = () => {
                 <Link
                     to="/admin"
                     className={
-                        "rounded-md text-gray-400 flex items-center mt-4 mx-4 p-2 cursor-pointer hover:bg-gray-700 hover:text-white hover:stroke-white stroke-gray-400" +
+                        "rounded-md text-gray-400 flex items-center mx-4 p-2 cursor-pointer hover:bg-gray-700 hover:text-white hover:stroke-white stroke-gray-400" +
                         (pathname === "/admin" ? " bg-gray-700 text-white" : "")
                     }
                 >

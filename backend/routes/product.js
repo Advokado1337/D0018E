@@ -1,4 +1,35 @@
 export default {
+    post: (req, res) => {
+        const { database, body } = req
+
+        if (
+            !body.label ||
+            !body.price ||
+            !body.description ||
+            !body.colors ||
+            !body.sizes
+        ) {
+            return res.sendStatus(400)
+        }
+
+        database.query(
+            "INSERT INTO product (label, price, description, colors, sizes, image) VALUES (?, ?, ?, ?, ?, ?)",
+            [
+                body.label,
+                body.price,
+                body.description,
+                JSON.stringify(body.colors),
+                JSON.stringify(body.sizes),
+                "test",
+            ],
+            (err, results) => {
+                if (err) {
+                    throw err
+                }
+                res.status(200)
+            }
+        )
+    },
     put: (req, res) => {
         const { database, params, body } = req
         let sql = "UPDATE product SET "
@@ -19,11 +50,11 @@ export default {
         }
         if (body.colors) {
             updates.push("colors = ?")
-            paramsList.push(body.colors)
+            paramsList.push(JSON.stringify(body.colors))
         }
         if (body.sizes) {
             updates.push("sizes = ?")
-            paramsList.push(body.sizes)
+            paramsList.push(JSON.stringify(body.sizes))
         }
 
         if (!updates.length) {
