@@ -73,11 +73,11 @@ const Cart = () => {
                             </div>
                             <div className="w-1/3">
                                 <select
-                                    name="country"
+                                    value={item.amount}
                                     className="block rounded-md bg-white px-4 border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
                                 >
                                     {[...Array(10).keys()].map((i) => (
-                                        <option key={i}>{i + 1}</option>
+                                        <option value={i+1} key={i}>{i + 1}</option>
                                     ))}
                                 </select>
                                 <button className="text-indigo-600 mt-4 font-semibold">
