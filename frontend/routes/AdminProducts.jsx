@@ -561,16 +561,18 @@ const AdminProducts = () => {
                                                         <option value="">
                                                             Color
                                                         </option>
-                                                        {Object.keys(
-                                                            colors
-                                                        ).map((color) => (
-                                                            <option
-                                                                key={color}
-                                                                value={color}
-                                                            >
-                                                                {color}
-                                                            </option>
-                                                        ))}
+                                                        {editProduct.colors.map(
+                                                            (color) => (
+                                                                <option
+                                                                    key={color}
+                                                                    value={
+                                                                        color
+                                                                    }
+                                                                >
+                                                                    {color}
+                                                                </option>
+                                                            )
+                                                        )}
                                                     </select>
                                                 </div>
                                                 <div className="flex flex-col w-full">
@@ -596,8 +598,8 @@ const AdminProducts = () => {
                                             </div>
                                             <div className="flex w-full">
                                                 <button
-                                                    onClick={() =>
-                                                        handleCreateInventory()
+                                                    onClick={
+                                                        handleCreateInventory
                                                     }
                                                     className="bg-indigo-500 hover:bg-indigo-400 text-white rounded-md p-2 mt-4 ml-auto"
                                                 >
@@ -609,7 +611,11 @@ const AdminProducts = () => {
                                     {editProduct.inventories.map(
                                         (inventory) => (
                                             <div
-                                                key={inventory.inventory_id}
+                                                key={
+                                                    inventory.inventory_id ||
+                                                    inventory.size +
+                                                        inventory.color
+                                                }
                                                 className="flex flex-col p-2 bg-white rounded-md mb-4"
                                             >
                                                 <div className="flex w-full">
@@ -663,14 +669,6 @@ const AdminProducts = () => {
                                                         />
                                                     </div>
                                                 </div>
-                                                {/* <div className="flex w-full">
-                                                    <button
-                                                        onClick={() => {}}
-                                                        className="bg-indigo-500 hover:bg-indigo-400 text-white rounded-md p-2 mt-4 ml-auto"
-                                                    >
-                                                        Save
-                                                    </button>
-                                                </div> */}
                                             </div>
                                         )
                                     )}

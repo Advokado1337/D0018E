@@ -36,6 +36,39 @@ export default {
         let updates = []
         let paramsList = []
 
+        body.inventories = body.inventories || []
+
+        body.inventories.forEach((inventory) => {
+            if (inventory.inventory_id) {
+                database.query(
+                    "UPDATE inventory SET quantity = ? WHERE inventory_id = ?",
+                    [inventory.quantity, inventory.inventory_id],
+                    (err, result) => {
+                        if (err) {
+                            console.log(err)
+                            return res.sendStatus(500)
+                        }
+                    }
+                )
+            } else {
+                database.query(
+                    "INSERT INTO inventory (product_id, color, size, quantity) VALUES (?, ?, ?, ?)",
+                    [
+                        params.id,
+                        inventory.color,
+                        inventory.size,
+                        inventory.quantity,
+                    ],
+                    (err, result) => {
+                        if (err) {
+                            console.log(err)
+                            return res.sendStatus(500)
+                        }
+                    }
+                )
+            }
+        })
+
         if (body.label) {
             updates.push("label = ?")
             paramsList.push(body.label)
