@@ -57,16 +57,26 @@ const start = () => {
             next()
         })
 
+        // Products routes
         app.get("/api/products", products.get)
+
+        // Product routes
         app.get("/api/product/:id", product.get)
         app.put("/api/product/:id", product.put)
         app.delete("/api/product/:id", product.delete)
         app.post("/api/product", product.post)
+
+        // Cart routes
         app.post("/api/cart", cart.post)
         app.get("/api/cart", cart.get)
+        app.delete("/api/cart/:id", cart.delete)
+        app.put("/api/cart/:id", cart.put)
+
+        // Inventory routes
         app.get("/api/inventory/:id", inventory.get)
         app.post("/api/inventory/:id", inventory.post)
         app.put("/api/inventory/:id", inventory.put)
+
         app.get("*", (req, res) => {
             res.sendFile("index.html", options)
         })
