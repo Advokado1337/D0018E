@@ -1,9 +1,16 @@
-import React from "react"
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
+import React, { useEffect } from "react"
+import {
+    BrowserRouter as Router,
+    Routes,
+    Route,
+    useNavigate,
+} from "react-router-dom"
 import AdminProducts from "../routes/AdminProducts.jsx"
 import AdminPanel from "../routes/AdminPanel.jsx"
 import Products from "../routes/Products.jsx"
 import Product from "../routes/Product.jsx"
+import useAuth from "../hooks/useAuth.js"
+import Login from "../routes/Login.jsx"
 import Cart from "../routes/Cart.jsx"
 import Sidebar from "./Sidebar.jsx"
 import Navbar from "./Navbar.jsx"
@@ -22,6 +29,17 @@ const MainLayout = ({ children }) => {
 }
 
 const AdminLayout = ({ children }) => {
+    const { isAuthenticated } = useAuth()
+    const navigate = useNavigate()
+
+    useEffect(() => {
+        if (!isAuthenticated) {
+            return navigate("/login")
+        }
+    }, [])
+
+    if (!isAuthenticated) return null
+
     return (
         <div className="flex">
             <Sidebar />
@@ -43,8 +61,8 @@ const AdminLayout = ({ children }) => {
 }
 
 const MinimalLayout = ({ children }) => (
-    <div className="container mx-auto min-h-[100vh] max-w-7xl px-2 sm:px-6 lg:px-8">
-        {children}
+    <div className="w-full min-h-[100vh] px-2 bg-gray-100">
+        <div className="container mx-auto sm:px-6 lg:px-8 px-2">{children}</div>
     </div>
 )
 
@@ -82,6 +100,14 @@ const App = () => {
                     element={
                         <MinimalLayout>
                             <div>Not Found</div>
+                        </MinimalLayout>
+                    }
+                />
+                <Route
+                    path="/login"
+                    element={
+                        <MinimalLayout>
+                            <Login />
                         </MinimalLayout>
                     }
                 />
