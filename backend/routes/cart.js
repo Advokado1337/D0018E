@@ -10,7 +10,28 @@ export default {
             }
         )
     },
-
+    delete: (req, res) => {
+        const { database, params } = req
+        database.query(
+            "DELETE FROM cart_item WHERE cart_id = ?",
+            [params.id],
+            (err, result) => {
+                if (err) return res.sendStatus(500)
+                res.send(result)
+            }
+        )
+    },
+    put: (req, res) => {
+        const { database, params, body } = req
+        database.query(
+            "UPDATE cart_item SET amount = ? WHERE cart_id = ?",
+            [body.amount, params.id],
+            (err, result) => {
+                if (err) return res.sendStatus(500)
+                res.send(result)
+            }
+        )
+    },
     post: (req, res) => {
         const { database, session_id, body } = req
 
