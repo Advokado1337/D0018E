@@ -1,3 +1,5 @@
+import authentication from "./routes/authentication.js"
+import protect from "./middleware/protect.js"
 import products from "./routes/products.js"
 import product from "./routes/product.js"
 import cart from "./routes/cart.js"
@@ -8,6 +10,7 @@ import * as url from "url"
 import mysql from "mysql"
 import path from "path"
 import cookieParser from "cookie-parser"
+import bodyParser from "body-parser"
 import { v4 as uuidv4 } from "uuid"
 
 dotenv.config()
@@ -34,6 +37,7 @@ const start = () => {
 
         app.use(express.static("public"))
         app.use(express.json())
+        app.use(bodyParser.urlencoded({ extended: true }))
         app.use(cookieParser("secret"))
 
         app.use((req, res, next) => {
@@ -59,14 +63,17 @@ const start = () => {
 
         app.get("/api/products", products.get)
         app.get("/api/product/:id", product.get)
-        app.put("/api/product/:id", product.put)
-        app.delete("/api/product/:id", product.delete)
-        app.post("/api/product", product.post)
+        app.put("/api/product/:id", protect, product.put)
+        app.delete("/api/product/:id", protect, product.delete)
+        app.post("/api/product", protect, product.post)
         app.post("/api/cart", cart.post)
         app.get("/api/cart", cart.get)
-        app.get("/api/inventory/:id", inventory.get)
-        app.post("/api/inventory/:id", inventory.post)
-        app.put("/api/inventory/:id", inventory.put)
+        app.get("/api/inventory/:id", protect, inventory.get)
+        app.post("/api/inventory/:id", protect, inventory.post)
+        app.put("/api/inventory/:id", protect, inventory.put)
+
+        app.post("/api/login", authentication.post)
+
         app.get("*", (req, res) => {
             res.sendFile("index.html", options)
         })

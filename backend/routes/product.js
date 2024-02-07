@@ -146,7 +146,7 @@ export default {
             if (result.length) {
                 const product = {
                     product_id: result[0].product_id,
-                    name: result[0].name,
+                    label: result[0].label,
                     description: result[0].description,
                     price: result[0].price,
                     colors: JSON.parse(result[0].colors),

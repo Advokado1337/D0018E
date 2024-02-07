@@ -1,7 +1,14 @@
+import useAuth from "../hooks/useAuth.js"
 import React, { useState } from "react"
 
 const Login = () => {
     const [passwordVisibility, setPasswordVisibility] = useState(false)
+    const [username, setUsername] = useState("")
+    const [password, setPassword] = useState("")
+
+    const { authenticated } = useAuth()
+
+    if (authenticated) return null
 
     return (
         <div className="flex w-full h-[100vh] items-center justify-center">
@@ -10,10 +17,17 @@ const Login = () => {
                 <p className="text-gray-600">
                     Enter your administrator credentials
                 </p>
-                <div className="mt-4 flex flex-col w-full">
+                <form
+                    method="POST"
+                    action="/api/login"
+                    className="mt-4 flex flex-col w-full"
+                >
                     <div className="flex flex-col w-full">
                         <label className="font-semibold">Username</label>
                         <input
+                            onChange={(e) => setUsername(e.target.value)}
+                            value={username}
+                            required
                             type="text"
                             name="username"
                             className="border-2 mt-2 border-gray-200 bg-gray-100 outline-none rounded-md p-2 hover:ring-2 focus:ring-2 focus:ring-indigo-500"
@@ -24,8 +38,11 @@ const Login = () => {
                         <div className="border-2 mt-2 flex border-gray-200 bg-gray-100 rounded-md p-2 hover:ring-2 focus-within:ring-2 focus-within:ring-indigo-500">
                             <input
                                 type={passwordVisibility ? "text" : "password"}
-                                name="username"
+                                value={password}
+                                name="password"
+                                required
                                 className="outline-none bg-gray-100 w-full"
+                                onChange={(e) => setPassword(e.target.value)}
                             />
                             {passwordVisibility ? (
                                 <svg
@@ -68,11 +85,14 @@ const Login = () => {
                         </div>
                     </div>
                     <div className="flex w-full">
-                        <button className="ml-auto bg-indigo-500 text-white px-4 py-2 rounded-md mt-8 hover:bg-indigo-600 active:bg-indigo-700">
+                        <button
+                            className="ml-auto bg-indigo-500 text-white px-4 py-2 rounded-md mt-8 hover:bg-indigo-600 active:bg-indigo-700"
+                            type="submit"
+                        >
                             Login
                         </button>
                     </div>
-                </div>
+                </form>
             </div>
         </div>
     )

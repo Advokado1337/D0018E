@@ -158,6 +158,7 @@ const AdminProducts = () => {
         const response = await fetch("/api/product/" + id)
         const data = await response.json()
         setEditProduct(data)
+
         setIsLoadingProduct(false)
     }
 

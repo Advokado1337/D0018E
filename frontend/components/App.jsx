@@ -1,10 +1,5 @@
-import React, { useEffect } from "react"
-import {
-    BrowserRouter as Router,
-    Routes,
-    Route,
-    useNavigate,
-} from "react-router-dom"
+import React from "react"
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
 import AdminProducts from "../routes/AdminProducts.jsx"
 import AdminPanel from "../routes/AdminPanel.jsx"
 import Products from "../routes/Products.jsx"
@@ -30,13 +25,6 @@ const MainLayout = ({ children }) => {
 
 const AdminLayout = ({ children }) => {
     const { isAuthenticated } = useAuth()
-    const navigate = useNavigate()
-
-    useEffect(() => {
-        if (!isAuthenticated) {
-            return navigate("/login")
-        }
-    }, [])
 
     if (!isAuthenticated) return null
 
