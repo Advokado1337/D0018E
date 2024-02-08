@@ -1,17 +1,18 @@
 import authentication from "./routes/authentication.js"
 import protect from "./middleware/protect.js"
+import inventory from "./routes/inventory.js"
 import products from "./routes/products.js"
 import product from "./routes/product.js"
+import cookieParser from "cookie-parser"
+import order from "./routes/order.js"
+import bodyParser from "body-parser"
 import cart from "./routes/cart.js"
-import inventory from "./routes/inventory.js"
+import { v4 as uuidv4 } from "uuid"
 import express from "express"
 import dotenv from "dotenv"
 import * as url from "url"
 import mysql from "mysql"
 import path from "path"
-import cookieParser from "cookie-parser"
-import bodyParser from "body-parser"
-import { v4 as uuidv4 } from "uuid"
 
 dotenv.config()
 
@@ -83,6 +84,9 @@ const start = () => {
 
         // Login route
         app.post("/api/login", authentication.post)
+
+        // Order routes
+        app.post("/api/order", order.post)
 
         app.get("*", (req, res) => {
             res.sendFile("index.html", options)

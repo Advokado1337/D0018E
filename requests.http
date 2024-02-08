@@ -30,3 +30,32 @@ Content-Type: application/json
     "username": "admin",
     "password": "password123"
 }
+
+### Add to cart
+POST http://localhost:3000/api/cart
+Content-Type: application/json
+
+{
+    "product_id": 2,
+    "size": "S",
+    "color": "red"
+}
+
+### Create order
+POST http://localhost:3000/api/order
+Content-Type: application/json
+
+{
+    "provider": "paypal",
+    "cardnumber": "1234567890123456",
+    "expiration": "12/2020",
+    "cvc": "123",
+    "firstname": "John",
+    "lastname": "Doe",
+    "email": "johndoe@gmail.com",
+    "address": "1234 Main St",
+    "city": "New York",
+    "country": "USA",
+    "zip": "10001",
+    "phonenumber": "1234567890"
+}
