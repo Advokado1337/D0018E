@@ -1,14 +1,15 @@
+import inventory from "./routes/inventory.js"
 import products from "./routes/products.js"
 import product from "./routes/product.js"
+import cookieParser from "cookie-parser"
+import order from "./routes/order.js"
 import cart from "./routes/cart.js"
-import inventory from "./routes/inventory.js"
+import { v4 as uuidv4 } from "uuid"
 import express from "express"
 import dotenv from "dotenv"
 import * as url from "url"
 import mysql from "mysql"
 import path from "path"
-import cookieParser from "cookie-parser"
-import { v4 as uuidv4 } from "uuid"
 
 dotenv.config()
 
@@ -67,6 +68,9 @@ const start = () => {
         app.get("/api/inventory/:id", inventory.get)
         app.post("/api/inventory/:id", inventory.post)
         app.put("/api/inventory/:id", inventory.put)
+
+        app.post("/api/order", order.post)
+
         app.get("*", (req, res) => {
             res.sendFile("index.html", options)
         })
