@@ -3,9 +3,11 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
 import AdminProducts from "../routes/AdminProducts.jsx"
 import AdminPanel from "../routes/AdminPanel.jsx"
 import Products from "../routes/Products.jsx"
+import Checkout from "../routes/Checkout.jsx"
 import Product from "../routes/Product.jsx"
 import useAuth from "../hooks/useAuth.js"
 import Login from "../routes/Login.jsx"
+import Order from "../routes/Order.jsx"
 import Cart from "../routes/Cart.jsx"
 import Sidebar from "./Sidebar.jsx"
 import Navbar from "./Navbar.jsx"
@@ -80,6 +82,22 @@ const App = () => {
                     element={
                         <MainLayout>
                             <Cart />
+                        </MainLayout>
+                    }
+                />
+                <Route
+                    path="/checkout"
+                    element={
+                        <MainLayout>
+                            <Checkout />
+                        </MainLayout>
+                    }
+                />
+                <Route
+                    path="/order/:id"
+                    element={
+                        <MainLayout>
+                            <Order />
                         </MainLayout>
                     }
                 />

@@ -1,6 +1,50 @@
 import query from "../query.js"
 
 export default {
+    get: async (req, res) => {
+        const { database, session_id, params } = req
+
+        const sqlOrder = `
+            SELECT *
+            FROM orders
+            WHERE session_id = ? AND orders_id = ?
+        `
+        const [order] = await query(database, sqlOrder, [session_id, params.id])
+
+        if (!order) return res.sendStatus(404)
+
+        const sqlCart = `
+            SELECT ci.*, p.*
+            FROM cart_item ci
+            JOIN product p ON ci.product_id = p.product_id
+            WHERE ci.orders_id = ?
+        `
+        const cart = await query(database, sqlCart, [params.id])
+
+        order.cart = cart
+
+        const sqlPayment = `
+            SELECT total
+            FROM payment_details 
+            WHERE payment_id = ?
+        `
+        const [payment] = await query(database, sqlPayment, [order.payment_id])
+
+        order.payment = payment
+
+        const sqlCustomer = `
+            SELECT *
+            FROM customer
+            WHERE customer_id = ?
+        `
+        const [customer] = await query(database, sqlCustomer, [
+            order.customer_id,
+        ])
+
+        order.customer = customer
+
+        res.json(order)
+    },
     post: async (req, res) => {
         const { database, session_id, body } = req
 
@@ -16,10 +60,9 @@ export default {
         if (!totalPrice) return res.sendStatus(400)
 
         const sqlPayment = `
-            INSERT INTO payment_details (provider, cardnumber, expiration, cvc, total)
-            VALUES (?, ?, ?, ?, ?)`
+            INSERT INTO payment_details (cardnumber, expiration, cvc, total)
+            VALUES (?, ?, ?, ?)`
         const paramsPayment = [
-            body.provider,
             body.cardnumber,
             body.expiration,
             body.cvc,
@@ -69,5 +112,4 @@ export default {
 
         res.json({ orders_id })
     },
-    get: async (req, res) => {},
 }

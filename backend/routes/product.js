@@ -24,7 +24,8 @@ export default {
             ],
             (err, results) => {
                 if (err) {
-                    throw err
+                    console.log(err)
+                    return res.sendStatus(500)
                 }
                 res.status(200)
             }

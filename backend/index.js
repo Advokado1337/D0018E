@@ -4,6 +4,7 @@ import inventory from "./routes/inventory.js"
 import products from "./routes/products.js"
 import product from "./routes/product.js"
 import cookieParser from "cookie-parser"
+import { body } from "express-validator"
 import order from "./routes/order.js"
 import bodyParser from "body-parser"
 import cart from "./routes/cart.js"
@@ -69,24 +70,82 @@ const start = () => {
         app.get("/api/product/:id", product.get)
         app.put("/api/product/:id", protect, product.put)
         app.delete("/api/product/:id", protect, product.delete)
-        app.post("/api/product", protect, product.post)
+        app.post(
+            "/api/product",
+            protect,
+            [
+                body("label").notEmpty().isString().isLength({ max: 255 }),
+                body("price").notEmpty().isNumeric(),
+                body("description")
+                    .notEmpty()
+                    .isString()
+                    .isLength({ max: 2000 }),
+                body("colors").notEmpty().isArray(),
+                body("sizes").notEmpty().isArray(),
+            ],
+            product.post
+        )
 
         // Cart routes
-        app.post("/api/cart", cart.post)
+        app.post(
+            "/api/cart",
+            [
+                body("product_id").notEmpty().isInt(),
+                body("color").notEmpty().isString(),
+                body("size").notEmpty().isString(),
+            ],
+            cart.post
+        )
         app.get("/api/cart", cart.get)
         app.delete("/api/cart/:id", cart.delete)
         app.put("/api/cart/:id", cart.put)
 
         // Inventory routes
         app.get("/api/inventory/:id", protect, inventory.get)
-        app.post("/api/inventory/:id", protect, inventory.post)
+        app.post(
+            "/api/inventory/:id",
+            [
+                body("color").notEmpty().isString().isLength({ max: 255 }),
+                body("size").notEmpty().isString().isLength({ max: 255 }),
+                body("quantity").notEmpty().isInt(),
+            ],
+            protect,
+            inventory.post
+        )
         app.put("/api/inventory/:id", protect, inventory.put)
 
         // Login route
-        app.post("/api/login", authentication.post)
+        app.post(
+            "/api/login",
+            [
+                body("username").notEmpty().isString(),
+                body("password").notEmpty().isString(),
+            ],
+            authentication.post
+        )
 
         // Order routes
-        app.post("/api/order", order.post)
+        app.post(
+            "/api/order",
+            [
+                body("cardnumber").notEmpty().isString().isLength({ max: 45 }),
+                body("expiration").notEmpty().isString().isLength({ max: 45 }),
+                body("cvc").notEmpty().isString().isLength({ max: 3 }),
+                body("firstname").notEmpty().isString().isLength({ max: 255 }),
+                body("lastname").notEmpty().isString().isLength({ max: 255 }),
+                body("country").notEmpty().isString().isLength({ max: 255 }),
+                body("city").notEmpty().isString().isLength({ max: 255 }),
+                body("zip").notEmpty().isString().isLength({ max: 255 }),
+                body("address").notEmpty().isString().isLength({ max: 255 }),
+                body("phonenumber")
+                    .notEmpty()
+                    .isString()
+                    .isLength({ max: 255 }),
+                body("email").notEmpty().isString().isLength({ max: 255 }),
+            ],
+            order.post
+        )
+        app.get("/api/order/:id", order.get)
 
         app.get("*", (req, res) => {
             res.sendFile("index.html", options)

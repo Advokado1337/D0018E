@@ -19,6 +19,19 @@ Content-Type: application/json
     "price": 150
 }
 
+### Create product
+
+POST http://localhost:3000/api/product
+Content-Type: application/json
+
+{
+    "label": "t-shirt",
+    "price": 100,
+    "colors": ["red", "blue"],
+    "sizes": ["S", "M", "L", "XL"],
+    "description": "This is a t-shirt"
+}
+
 ### Delete product
 DELETE http://localhost:3000/api/product/4
 

@@ -1,14 +1,18 @@
 export default {
     get: (req, res) => {
         const { database, session_id } = req
-        database.query(
-            "SELECT ci.*, p.* FROM cart_item ci JOIN product p ON ci.product_id = p.product_id WHERE ci.session_id = ?",
-            [session_id],
-            (err, result) => {
-                if (err) return res.sendStatus(500)
-                res.send(result)
-            }
-        )
+
+        const sql = `
+            SELECT ci.*, p.*
+            FROM cart_item ci
+            JOIN product p ON ci.product_id = p.product_id
+            WHERE ci.session_id = ? AND ci.orders_id IS NULL
+        `
+
+        database.query(sql, [session_id], (err, result) => {
+            if (err) return res.sendStatus(500)
+            res.json(result)
+        })
     },
     delete: (req, res) => {
         const { database, params } = req
