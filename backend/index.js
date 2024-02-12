@@ -5,6 +5,7 @@ import products from "./routes/products.js"
 import product from "./routes/product.js"
 import cookieParser from "cookie-parser"
 import { body } from "express-validator"
+import orders from "./routes/orders.js"
 import order from "./routes/order.js"
 import bodyParser from "body-parser"
 import cart from "./routes/cart.js"
@@ -146,6 +147,9 @@ const start = () => {
             order.post
         )
         app.get("/api/order/:id", order.get)
+
+        // Orders
+        app.get("/api/orders", protect, orders.get)
 
         app.get("*", (req, res) => {
             res.sendFile("index.html", options)

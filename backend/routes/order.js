@@ -59,6 +59,22 @@ export default {
 
         if (!totalPrice) return res.sendStatus(400)
 
+        const sqlCheckStock = `
+            SELECT DISTINCT ci.product_id, ci.amount, i.quantity, ci.size, ci.color
+            FROM cart_item ci
+            JOIN inventory i ON ci.product_id = i.product_id AND ci.size = i.size AND ci.color = i.color
+            WHERE ci.session_id = ? AND ci.orders_id IS NULL
+        `
+        const cartItems = await query(database, sqlCheckStock, [session_id])
+
+        for (const item of cartItems) {
+            if (item.amount > item.quantity) {
+                return res.status(400).json({
+                    error: `Product with ID ${item.product_id} exceeds available stock.`,
+                })
+            }
+        }
+
         const sqlPayment = `
             INSERT INTO payment_details (cardnumber, expiration, cvc, total)
             VALUES (?, ?, ?, ?)`
@@ -96,9 +112,9 @@ export default {
         if (!customer_id) return res.sendStatus(500)
 
         const sqlOrder = `
-            INSERT INTO orders (session_id, customer_id, payment_id)
-            VALUES (?, ?, ?)`
-        const paramsOrder = [session_id, customer_id, payment_id]
+            INSERT INTO orders (session_id, customer_id, payment_id, status)
+            VALUES (?, ?, ?, ?)`
+        const paramsOrder = [session_id, customer_id, payment_id, "pending"]
 
         const orders = await query(database, sqlOrder, paramsOrder)
 
@@ -109,6 +125,20 @@ export default {
             SET orders_id = ?
             WHERE session_id = ?`
         await query(database, sqlUpdateCart, [orders_id, session_id])
+
+        for (const item of cartItems) {
+            const sqlUpdateInventory = `
+                UPDATE inventory
+                SET quantity = quantity - ?
+                WHERE product_id = ? AND size = ? AND color = ?
+            `
+            await query(database, sqlUpdateInventory, [
+                item.amount,
+                item.product_id,
+                item.size,
+                item.color,
+            ])
+        }
 
         res.json({ orders_id })
     },

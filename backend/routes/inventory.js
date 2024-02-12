@@ -10,7 +10,6 @@ export default {
             res.send(result)
         })
     },
-
     post: (req, res) => {
         const { database, params, body } = req
         const sql =

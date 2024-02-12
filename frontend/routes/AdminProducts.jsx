@@ -14,12 +14,6 @@ const AdminProducts = () => {
     const [dialog, setDialog] = useState(false)
     const [editing, setEditing] = useState(null)
     const [isLoadingProducts, setIsLoadingProducts] = useState(true)
-    const [newInventory, setNewInventory] = useState({
-        size: "",
-        color: "",
-        quantity: 0,
-        open: false,
-    })
     const [isLoadingProduct, setIsLoadingProduct] = useState(true)
 
     useEffect(() => {
@@ -43,47 +37,6 @@ const AdminProducts = () => {
         setEditProduct({
             ...editProduct,
             [e.target.name]: e.target.value,
-        })
-    }
-
-    const handleCreateInventory = () => {
-        if (
-            !newInventory.size ||
-            !newInventory.color ||
-            !newInventory.quantity ||
-            newInventory.size === "Size" ||
-            newInventory.color === "Color"
-        ) {
-            return alert("Please fill all fields")
-        }
-
-        const isDuplicate = editProduct.inventories.find(
-            (inventory) =>
-                inventory.size === newInventory.size &&
-                inventory.color === newInventory.color
-        )
-
-        if (isDuplicate) {
-            return alert("Inventory already exists")
-        }
-
-        setEditProduct({
-            ...editProduct,
-            inventories: [
-                ...editProduct.inventories,
-                {
-                    size: newInventory.size,
-                    color: newInventory.color,
-                    quantity: newInventory.quantity,
-                },
-            ],
-        })
-
-        setNewInventory({
-            size: "",
-            color: "",
-            quantity: 0,
-            open: false,
         })
     }
 
@@ -493,122 +446,8 @@ const AdminProducts = () => {
                                     <h3 className="font-semibold w-full text-gray-500">
                                         Inventory
                                     </h3>
-                                    {!newInventory.open && (
-                                        <button
-                                            className="bg-indigo-500 hover:bg-indigo-400 text-white rounded-md p-2 shrink-0"
-                                            onClick={() =>
-                                                setNewInventory({
-                                                    ...newInventory,
-                                                    open: !newInventory.open,
-                                                })
-                                            }
-                                        >
-                                            New Inventory
-                                        </button>
-                                    )}
                                 </div>
                                 <div className="mt-4">
-                                    {newInventory.open && (
-                                        <div className="flex flex-col p-2 bg-white rounded-md mb-4">
-                                            <div className="flex w-full">
-                                                <div className="flex flex-col w-full pr-8">
-                                                    <div className="text-gray-500">
-                                                        Size
-                                                    </div>
-                                                    <select
-                                                        onChange={(e) => {
-                                                            setNewInventory({
-                                                                ...newInventory,
-                                                                size: e.target
-                                                                    .value,
-                                                            })
-                                                        }}
-                                                        className="w-full m-2 p-2 rounded-md mt-2 border-none outline-none ring-2 ring-gray-400 focus:ring-indigo-500"
-                                                    >
-                                                        <option value="">
-                                                            Size
-                                                        </option>
-                                                        {[
-                                                            "XS",
-                                                            "S",
-                                                            "M",
-                                                            "L",
-                                                            "XL",
-                                                            "XXL",
-                                                        ].map((size) => (
-                                                            <option
-                                                                key={size}
-                                                                value={size}
-                                                            >
-                                                                {size}
-                                                            </option>
-                                                        ))}
-                                                    </select>
-                                                </div>
-                                                <div className="flex flex-col w-full pr-8">
-                                                    <div className="text-gray-500">
-                                                        Color
-                                                    </div>
-                                                    <select
-                                                        onChange={(e) => {
-                                                            setNewInventory({
-                                                                ...newInventory,
-                                                                color: e.target
-                                                                    .value,
-                                                            })
-                                                        }}
-                                                        className="w-full p-2 rounded-md mt-2 border-none outline-none ring-2 ring-gray-400 focus:ring-indigo-500"
-                                                    >
-                                                        <option value="">
-                                                            Color
-                                                        </option>
-                                                        {editProduct.colors.map(
-                                                            (color) => (
-                                                                <option
-                                                                    key={color}
-                                                                    value={
-                                                                        color
-                                                                    }
-                                                                >
-                                                                    {color}
-                                                                </option>
-                                                            )
-                                                        )}
-                                                    </select>
-                                                </div>
-                                                <div className="flex flex-col w-full">
-                                                    <div className="text-gray-500">
-                                                        Quantity
-                                                    </div>
-                                                    <input
-                                                        type="number"
-                                                        value={
-                                                            newInventory.quantity
-                                                        }
-                                                        onChange={(e) => {
-                                                            setNewInventory({
-                                                                ...newInventory,
-                                                                quantity:
-                                                                    e.target
-                                                                        .value,
-                                                            })
-                                                        }}
-                                                        className="w-full p-2 rounded-md mt-2 border-none outline-none ring-2 ring-gray-400 focus:ring-indigo-500"
-                                                    />
-                                                </div>
-                                            </div>
-                                            <div className="flex w-full">
-                                                <button
-                                                    onClick={
-                                                        handleCreateInventory
-                                                    }
-                                                    className="bg-indigo-500 hover:bg-indigo-400 text-white rounded-md p-2 mt-4 ml-auto"
-                                                >
-                                                    Create
-                                                </button>
-                                            </div>
-                                        </div>
-                                    )}
                                     {editProduct.inventories.map(
                                         (inventory) => (
                                             <div

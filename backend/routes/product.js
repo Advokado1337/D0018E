@@ -20,102 +20,168 @@ export default {
                 body.description,
                 JSON.stringify(body.colors),
                 JSON.stringify(body.sizes),
-                "test",
+                "mogging.jpg",
             ],
-            (err, results) => {
+            (err, productResults) => {
                 if (err) {
                     console.log(err)
                     return res.sendStatus(500)
                 }
+
+                const productId = productResults.insertId
+
+                body.colors.forEach((color) => {
+                    body.sizes.forEach((size) => {
+                        const inventoryInsertQuery = `
+                            INSERT INTO inventory (product_id, color, size, quantity)
+                            VALUES (?, ?, ?, ?)
+                        `
+                        const defaultQuantity = 0
+
+                        database.query(inventoryInsertQuery, [
+                            productId,
+                            color,
+                            size,
+                            defaultQuantity,
+                        ])
+                    })
+                })
+
                 res.status(200)
             }
         )
     },
     put: (req, res) => {
         const { database, params, body } = req
-        let sql = "UPDATE product SET "
-        let updates = []
-        let paramsList = []
 
-        body.inventories = body.inventories || []
-
-        body.inventories.forEach((inventory) => {
-            if (inventory.inventory_id) {
-                database.query(
-                    "UPDATE inventory SET quantity = ? WHERE inventory_id = ?",
-                    [inventory.quantity, inventory.inventory_id],
-                    (err, result) => {
-                        if (err) {
-                            console.log(err)
-                            return res.sendStatus(500)
-                        }
-                    }
-                )
-            } else {
-                database.query(
-                    "INSERT INTO inventory (product_id, color, size, quantity) VALUES (?, ?, ?, ?)",
-                    [
-                        params.id,
-                        inventory.color,
-                        inventory.size,
-                        inventory.quantity,
-                    ],
-                    (err, result) => {
-                        if (err) {
-                            console.log(err)
-                            return res.sendStatus(500)
-                        }
-                    }
-                )
-            }
-        })
-
-        if (body.label) {
-            updates.push("label = ?")
-            paramsList.push(body.label)
-        }
-        if (body.price) {
-            updates.push("price = ?")
-            paramsList.push(body.price)
-        }
-        if (body.description) {
-            updates.push("description = ?")
-            paramsList.push(body.description)
-        }
-        if (body.colors) {
-            updates.push("colors = ?")
-            paramsList.push(JSON.stringify(body.colors))
-        }
-        if (body.sizes) {
-            updates.push("sizes = ?")
-            paramsList.push(JSON.stringify(body.sizes))
-        }
-
-        if (!updates.length) {
-            return res.sendStatus(400)
-        }
-
-        sql += updates.join(", ") + " WHERE product_id = ?"
-        paramsList.push(params.id)
-
-        database.query(sql, paramsList, (err, result) => {
-            if (err) {
-                console.log(err)
-                return res.sendStatus(500)
-            }
-
-            database.query(
-                "SELECT * FROM product WHERE product_id = ?",
-                [params.id],
-                (err, result) => {
-                    if (err) {
-                        console.log(err)
-                        return res.sendStatus(500)
-                    }
-                    res.send(result)
+        database.query(
+            "SELECT colors, sizes FROM product WHERE product_id = ?",
+            [params.id],
+            (err, results) => {
+                if (err) {
+                    console.log(err)
+                    return res.sendStatus(500)
                 }
-            )
-        })
+
+                const existingProduct = results[0]
+                const existingColors = JSON.parse(existingProduct.colors)
+                const existingSizes = JSON.parse(existingProduct.sizes)
+                const newColors = body.colors ? body.colors : existingColors
+                const newSizes = body.sizes ? body.sizes : existingSizes
+
+                const colorsToAdd = newColors.filter(
+                    (color) => !existingColors.includes(color)
+                )
+                const colorsToRemove = existingColors.filter(
+                    (color) => !newColors.includes(color)
+                )
+
+                const sizesToAdd = newSizes.filter(
+                    (size) => !existingSizes.includes(size)
+                )
+                const sizesToRemove = existingSizes.filter(
+                    (size) => !newSizes.includes(size)
+                )
+
+                colorsToRemove.forEach((color) => {
+                    database.query(
+                        "DELETE FROM inventory WHERE product_id = ? AND color = ?",
+                        [params.id, color]
+                    )
+                })
+
+                sizesToRemove.forEach((size) => {
+                    database.query(
+                        "DELETE FROM inventory WHERE product_id = ? AND size = ?",
+                        [params.id, size]
+                    )
+                })
+
+                colorsToAdd.forEach((color) => {
+                    newSizes.forEach((size) => {
+                        database.query(
+                            "INSERT INTO inventory (product_id, color, size, quantity) VALUES (?, ?, ?, ?)",
+                            [params.id, color, size, 0]
+                        )
+                    })
+                })
+
+                sizesToAdd.forEach((size) => {
+                    newColors.forEach((color) => {
+                        database.query(
+                            "INSERT INTO inventory (product_id, color, size, quantity) VALUES (?, ?, ?, ?)",
+                            [params.id, color, size, 0]
+                        )
+                    })
+                })
+
+                if (body.inventories) {
+                    body.inventories.forEach((inventory) => {
+                        database.query(
+                            "UPDATE inventory SET quantity = ? WHERE inventory_id = ?",
+                            [inventory.quantity, inventory.inventory_id]
+                        )
+                    })
+                }
+
+                let updates = []
+                let paramsList = []
+
+                if (body.label) {
+                    updates.push("label = ?")
+                    paramsList.push(body.label)
+                }
+                if (body.price) {
+                    updates.push("price = ?")
+                    paramsList.push(body.price)
+                }
+                if (body.description) {
+                    updates.push("description = ?")
+                    paramsList.push(body.description)
+                }
+                if (body.colors) {
+                    updates.push("colors = ?")
+                    paramsList.push(JSON.stringify(newColors))
+                }
+                if (body.sizes) {
+                    updates.push("sizes = ?")
+                    paramsList.push(JSON.stringify(newSizes))
+                }
+
+                if (updates.length > 0) {
+                    let sql =
+                        "UPDATE product SET " +
+                        updates.join(", ") +
+                        " WHERE product_id = ?"
+                    paramsList.push(params.id)
+
+                    database.query(
+                        sql,
+                        paramsList,
+                        (updateErr, updateResult) => {
+                            if (updateErr) {
+                                console.log(updateErr)
+                                return res.sendStatus(500)
+                            }
+
+                            database.query(
+                                "SELECT * FROM product WHERE product_id = ?",
+                                [params.id],
+                                (fetchErr, fetchResults) => {
+                                    if (fetchErr) {
+                                        console.log(fetchErr)
+                                        return res.sendStatus(500)
+                                    }
+                                    res.send(fetchResults)
+                                }
+                            )
+                        }
+                    )
+                } else {
+                    res.sendStatus(200)
+                }
+            }
+        )
     },
     delete: (req, res) => {
         const { database, params } = req

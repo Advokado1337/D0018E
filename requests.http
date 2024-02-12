@@ -44,15 +44,22 @@ Content-Type: application/json
     "password": "password123"
 }
 
+### Get cart
+GET http://localhost:3000/api/cart
+
 ### Add to cart
 POST http://localhost:3000/api/cart
 Content-Type: application/json
 
 {
-    "product_id": 2,
+    "product_id": 43,
     "size": "S",
     "color": "red"
 }
+
+### Delete from cart
+DELETE http://localhost:3000/api/cart/43
+
 
 ### Create order
 POST http://localhost:3000/api/order

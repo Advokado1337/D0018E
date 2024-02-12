@@ -44,12 +44,14 @@ export default {
         const params = [session_id, body.product_id, 1, body.size, body.color]
 
         database.query(
-            "SELECT * FROM cart_item WHERE session_id = ? AND product_id = ? AND size = ? AND color = ?",
+            "SELECT * FROM cart_item WHERE session_id = ? AND product_id = ? AND size = ? AND color = ? AND orders_id IS NULL",
             [session_id, body.product_id, body.size, body.color],
             (err, result) => {
+                console.log(result, body)
+
                 if (result.length) {
                     database.query(
-                        "UPDATE cart_item SET amount = amount + 1 WHERE session_id = ? AND product_id = ? AND size = ? AND color = ?",
+                        "UPDATE cart_item SET amount = amount + 1 WHERE session_id = ? AND product_id = ? AND size = ? AND color = ? AND orders_id IS NULL",
                         [session_id, body.product_id, body.size, body.color],
                         (err, result) => {
                             if (err) return res.sendStatus(500)
