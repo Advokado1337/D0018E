@@ -2,14 +2,17 @@ import query from "../query.js"
 
 export default {
     get: async (req, res) => {
-        const { database, session_id, params } = req
+        const { database, session_id, params, admin } = req
 
-        const sqlOrder = `
+        let sqlOrder = `
             SELECT *
             FROM orders
-            WHERE session_id = ? AND orders_id = ?
+            WHERE orders_id = ?
         `
-        const [order] = await query(database, sqlOrder, [session_id, params.id])
+
+        if (!admin) sqlOrder += "AND session_id = ?"
+
+        const [order] = await query(database, sqlOrder, [params.id, session_id])
 
         if (!order) return res.sendStatus(404)
 
@@ -44,6 +47,18 @@ export default {
         order.customer = customer
 
         res.json(order)
+    },
+    put: async (req, res) => {
+        const { database, params, body } = req
+
+        const sqlUpdate = `
+            UPDATE orders
+            SET status = ?
+            WHERE orders_id = ?
+        `
+        await query(database, sqlUpdate, [body.status, params.id])
+
+        res.sendStatus(200)
     },
     post: async (req, res) => {
         const { database, session_id, body } = req

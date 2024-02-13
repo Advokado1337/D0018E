@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react"
+import { Link } from "react-router-dom"
 
 const AdminOrders = () => {
     const [orders, setOrders] = useState([])
@@ -33,18 +34,38 @@ const AdminOrders = () => {
                 </div>
                 <div className="flex flex-col mt-8">
                     {orders.map((order) => (
-                        <div
-                            className="flex flex-col w-full"
-                            key={order.order_id}
+                        <Link
+                            to={"/admin/order/" + order.orders_id}
+                            className="flex flex-col w-full border border-gray-300 mb-4 p-4 rounded-md bg-white"
+                            key={order.orders_id}
                         >
-                            <div className="flex items-center justify-between">
-                                <h2 className="font-semibold text-xl">
-                                    Order #{order.order_id}
-                                </h2>
-                                <p className="text-gray-800"></p>
+                            <div className="flex w-full">
+                                <div className="flex w-full flex-col">
+                                    <div>Order ID</div>
+                                    <div className="font-medium">
+                                        #{order.orders_id}
+                                    </div>
+                                </div>
+                                <div className="flex w-full flex-col">
+                                    <div>Price</div>
+                                    <div className="font-medium">
+                                        ${order.total}
+                                    </div>
+                                </div>
+                                <div className="flex w-full flex-col">
+                                    <div>Customer</div>
+                                    <div className="font-medium">
+                                        {order.firstname} {order.lastname}
+                                    </div>
+                                </div>
+                                <div className="flex w-full flex-col">
+                                    <div>Address</div>
+                                    <div className="font-medium">
+                                        {order.address}
+                                    </div>
+                                </div>
                             </div>
-                            <div className="text-xl font-semibold mt-4"></div>
-                        </div>
+                        </Link>
                     ))}
                 </div>
             </div>

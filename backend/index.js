@@ -55,6 +55,9 @@ const start = () => {
                 req.session_id = id
                 return next()
             }
+            if (req.signedCookies.admin_token) {
+                req.admin = true
+            }
             req.session_id = req.signedCookies.session_id
             next()
         })
@@ -147,6 +150,7 @@ const start = () => {
             order.post
         )
         app.get("/api/order/:id", order.get)
+        app.put("/api/order/:id", protect, order.put)
 
         // Orders
         app.get("/api/orders", protect, orders.get)

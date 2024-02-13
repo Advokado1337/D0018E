@@ -97,7 +97,9 @@ const App = () => {
                     path="/order/:id"
                     element={
                         <MainLayout>
-                            <Order />
+                            <div className="py-8">
+                                <Order />
+                            </div>
                         </MainLayout>
                     }
                 />
@@ -122,6 +124,16 @@ const App = () => {
                     element={
                         <AdminLayout>
                             <AdminOrders />
+                        </AdminLayout>
+                    }
+                />
+                <Route
+                    path="/admin/order/:id"
+                    element={
+                        <AdminLayout>
+                            <div className="p-8">
+                                <Order editable={true} />
+                            </div>
                         </AdminLayout>
                     }
                 />
