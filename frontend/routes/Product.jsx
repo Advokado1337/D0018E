@@ -8,6 +8,7 @@ const Product = () => {
     const [selectedColor, setSelectedColor] = useState()
     const [selectedSize, setSelectedSize] = useState()
     const [addToCartThrottle, setAddToCartThrottle] = useState(false)
+    const [inStock, setInStock] = useState(false)
     const navigate = useNavigate()
 
     useEffect(() => {
@@ -16,10 +17,18 @@ const Product = () => {
             .then((data) => {
                 if (!data || !Object.keys(data).length) return navigate("/404")
                 setProduct(data)
+
                 setSelectedColor(data.colors[0])
                 setSelectedSize(data.sizes[0])
             })
     }, [])
+
+    useEffect(() => {
+        const inventory = product?.inventories.find(
+            (item) => item.color === selectedColor && item.size === selectedSize
+        )
+        setInStock(inventory?.quantity > 0)
+    }, [selectedColor, selectedSize])
 
     const colors = {
         gray: {
@@ -61,7 +70,7 @@ const Product = () => {
     }
 
     const handleAddToCart = () => {
-        if (addToCartThrottle) return
+        if (addToCartThrottle || !inStock) return
         setAddToCartThrottle(true)
         fetch("/api/cart", {
             method: "POST",
@@ -146,9 +155,10 @@ const Product = () => {
                     <p className="mt-2 text-gray-700">{product.description}</p>
                     <button
                         onClick={handleAddToCart}
+                        title={inStock ? "Add to cart" : "Out of stock"}
                         className={
                             "mt-4 py-3 rounded-md text-white justify-center flex w-full" +
-                            (addToCartThrottle
+                            (addToCartThrottle || !inStock
                                 ? " cursor-not-allowed bg-gray-400"
                                 : " bg-indigo-500 hover:bg-indigo-600")
                         }
