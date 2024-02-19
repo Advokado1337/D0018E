@@ -3,9 +3,10 @@ export default {
         const { database, session_id } = req
 
         const sql = `
-            SELECT ci.*, p.*
+            SELECT ci.*, p.*, i.*
             FROM cart_item ci
             JOIN product p ON ci.product_id = p.product_id
+            JOIN inventory i ON ci.product_id = i.product_id AND ci.size = i.size AND ci.color = i.color
             WHERE ci.session_id = ? AND ci.orders_id IS NULL
         `
 

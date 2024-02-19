@@ -24,20 +24,45 @@ const CartItem = ({ item, onUpdateCartItem, onRemoveCartItem, disabled }) => {
                     </div>
                     {disabled ? null : (
                         <div className="mt-auto flex">
-                            <svg
-                                width="25"
-                                height="25"
-                                viewBox="0 0 100 100"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path
-                                    fill="none"
-                                    stroke="green"
-                                    strokeWidth="10"
-                                    d="M 10,50 l 20,20 l 40,-40"
-                                />
-                            </svg>
-                            <div>In stock</div>
+                            {item.quantity > 0 ? (
+                                <>
+                                    <svg
+                                        width="25"
+                                        height="25"
+                                        viewBox="0 0 100 100"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                        <path
+                                            fill="none"
+                                            stroke="green"
+                                            strokeWidth="10"
+                                            d="M 10,50 l 20,20 l 40,-40"
+                                        />
+                                    </svg>
+                                    <div className="text-red-600 ml-2">
+                                        In stock
+                                    </div>
+                                </>
+                            ) : (
+                                <>
+                                    <svg
+                                        width="25"
+                                        height="25"
+                                        viewBox="0 0 100 100"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                        <path
+                                            fill="none"
+                                            stroke="red"
+                                            strokeWidth="10"
+                                            d="M 10,10 l 80,80 M 10,90 l 80,-80"
+                                        />
+                                    </svg>
+                                    <div className="text-red-600 ml-2">
+                                        Out of stock
+                                    </div>
+                                </>
+                            )}
                         </div>
                     )}
                 </div>

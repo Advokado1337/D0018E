@@ -8,6 +8,8 @@ const Checkout = () => {
     const [cart, setCart] = useState([])
     const [total, setTotal] = useState(0)
     const [isFormValid, setIsFormValid] = useState(false)
+    const [error, setError] = useState(null)
+    const [inStock, setInStock] = useState(true)
     const [form, setForm] = useState({
         email: "",
         phonenumber: "",
@@ -37,7 +39,13 @@ const Checkout = () => {
         if (!data.length) return navigate("/cart")
 
         let total = 0
-        data.forEach((item) => (total += item.price * item.amount))
+        data.forEach((item) => {
+            total += item.price * item.amount
+            if (!item.quantity) {
+                setError("Some items are out of stock")
+                setInStock(false)
+            }
+        })
 
         setTotal(total)
 
@@ -45,7 +53,7 @@ const Checkout = () => {
     }
 
     const handleFormSubmit = async () => {
-        if (!isFormValid) return
+        if (!isFormValid || inStock) return
 
         setIsLoading(true)
 
@@ -57,13 +65,20 @@ const Checkout = () => {
             body: JSON.stringify(form),
         })
 
-        if (response.status === 200) {
-            const data = await response.json()
+        let data
+
+        try {
+            data = await response.json()
+        } catch (error) {
+            console.log(error)
+        }
+
+        if (data && !data.error) {
             const { orders_id } = data
             navigate("/order/" + orders_id)
         } else {
+            setError(data.error)
             setIsLoading(false)
-            alert("An error occurred")
         }
     }
 
@@ -75,7 +90,6 @@ const Checkout = () => {
 
         const isValid = Object.keys(newForm).every((key) => {
             // Check if minLength attribute for input is fufilled
-
             if (target.minLength && value.length < target.minLength) {
                 return false
             }
@@ -91,7 +105,6 @@ const Checkout = () => {
         })
 
         setIsFormValid(isValid)
-
         setForm(newForm)
     }
 
@@ -324,7 +337,7 @@ const Checkout = () => {
                         <button
                             className={
                                 "w-full py-4 text-center mt-8 text-white font-semibold rounded-md" +
-                                (isFormValid
+                                (isFormValid && inStock
                                     ? " bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 cursor-pointer"
                                     : " bg-gray-300 cursor-not-allowed")
                             }
@@ -332,6 +345,11 @@ const Checkout = () => {
                         >
                             Place order
                         </button>
+                        {error && (
+                            <div className="bg-red-600 text-red-200 p-4 text-center mt-4">
+                                {error}
+                            </div>
+                        )}
                     </div>
                 </>
             )}

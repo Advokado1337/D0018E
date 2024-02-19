@@ -72,7 +72,8 @@ export default {
 
         const totalPrice = cart.total_price
 
-        if (!totalPrice) return res.sendStatus(400)
+        if (!totalPrice)
+            return res.json({ error: "No cart items in shopping cart" })
 
         const sqlCheckStock = `
             SELECT DISTINCT ci.product_id, ci.amount, i.quantity, ci.size, ci.color
@@ -84,7 +85,7 @@ export default {
 
         for (const item of cartItems) {
             if (item.amount > item.quantity) {
-                return res.status(400).json({
+                return res.json({
                     error: `Product with ID ${item.product_id} exceeds available stock.`,
                 })
             }
@@ -104,7 +105,9 @@ export default {
 
         const payment_id = payment.insertId
 
-        if (!payment_id) return res.sendStatus(500)
+        if (!payment_id) {
+            return res.json({ error: "Payment failed" })
+        }
 
         const sqlCustomer = `
             INSERT INTO customer (firstname, lastname, country, city, zip, address, phonenumber, email)
@@ -124,7 +127,9 @@ export default {
 
         const customer_id = customer.insertId
 
-        if (!customer_id) return res.sendStatus(500)
+        if (!customer_id) {
+            return res.json({ error: "Customer failed" })
+        }
 
         const sqlOrder = `
             INSERT INTO orders (session_id, customer_id, payment_id, status)
