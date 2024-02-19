@@ -7,6 +7,7 @@ import cookieParser from "cookie-parser"
 import { body } from "express-validator"
 import orders from "./routes/orders.js"
 import order from "./routes/order.js"
+import review from "./routes/review.js"
 import bodyParser from "body-parser"
 import cart from "./routes/cart.js"
 import { v4 as uuidv4 } from "uuid"
@@ -154,6 +155,10 @@ const start = () => {
 
         // Orders
         app.get("/api/orders", protect, orders.get)
+
+        // Review routes
+        app.get("/api/review/:id", review.get)
+        app.post("/api/review/:id", review.post)
 
         app.get("*", (req, res) => {
             res.sendFile("index.html", options)

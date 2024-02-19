@@ -57,6 +57,18 @@ Content-Type: application/json
     "color": "red"
 }
 
+### Get reviews
+GET http://localhost:3000/api/review/43
+
+### Place review
+POST http://localhost:3000/api/review/43
+Content-Type: application/json
+
+{
+    "rating": 5,
+    "text": "This is a great product"
+}
+
 ### Delete from cart
 DELETE http://localhost:3000/api/cart/43
 
