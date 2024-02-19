@@ -1,5 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom"
 import React, { useEffect, useState } from "react"
+import Loader from "../components/Loader.jsx"
 
 const Product = () => {
     const { id } = useParams()
@@ -7,40 +8,57 @@ const Product = () => {
     const [product, setProduct] = useState()
     const [selectedColor, setSelectedColor] = useState()
     const [selectedSize, setSelectedSize] = useState()
+    const [isLoading, setIsLoading] = useState(false)
     const [addToCartThrottle, setAddToCartThrottle] = useState(false)
     const [inStock, setInStock] = useState(false)
+    const [canReview, setCanReview] = useState(false)
     const [reviewModal, setReviewModal] = useState({
         open: false,
         text: "",
         rating: 0,
     })
-    const [reviews, setReviews] = useState([
-        {
-            name: "John Doe",
-            rating: 4,
-            text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-            createdAt: "2021-10-10",
-        },
-        {
-            name: "John Doe",
-            rating: 2,
-            text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-            createdAt: "2021-10-10",
-        },
-    ])
+    const [reviews, setReviews] = useState([])
     const navigate = useNavigate()
 
     useEffect(() => {
-        fetch("/api/product/" + id)
-            .then((res) => res.json())
-            .then((data) => {
-                if (!data || !Object.keys(data).length) return navigate("/404")
-                setProduct(data)
-
-                setSelectedColor(data.colors[0])
-                setSelectedSize(data.sizes[0])
-            })
+        fetchReviews()
+        fetchProduct()
     }, [])
+
+    const fetchProduct = async () => {
+        setIsLoading(true)
+
+        const response = await fetch("/api/product/" + id, {
+            method: "GET",
+        })
+
+        const data = await response.json()
+
+        if (!data || data.error) {
+            return navigate("/404")
+        }
+        setProduct(data)
+        setIsLoading(false)
+        setSelectedColor(data.colors[0])
+        setSelectedSize(data.sizes[0])
+    }
+
+    const fetchReviews = async () => {
+        setIsLoading(true)
+        const response = await fetch("/api/review/" + id, {
+            method: "GET",
+        })
+
+        const data = await response.json()
+
+        if (!data || data.error) {
+            return alert(data.error)
+        }
+
+        setCanReview(data.canReview)
+        setReviews(data.reviews)
+        setIsLoading(false)
+    }
 
     useEffect(() => {
         const inventory = product?.inventories.find(
@@ -89,7 +107,27 @@ const Product = () => {
     }
 
     const handleReviewModalOpen = () => {
+        if (!canReview) return
+
         setReviewModal({ open: true, text: "", rating: 0 })
+    }
+
+    const handleReviewSubmit = async () => {
+        console.log("ne")
+        setIsLoading(true)
+        await fetch("/api/review/" + id, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                text: reviewModal.text,
+                rating: reviewModal.rating,
+            }),
+        })
+
+        setReviewModal({ open: false, text: "", rating: 0 })
+        fetchReviews()
     }
 
     const handleAddToCart = () => {
@@ -111,7 +149,13 @@ const Product = () => {
         }, 1000)
     }
 
-    if (!product) return <div>Loading...</div>
+    if (isLoading || !product) {
+        return (
+            <div className="flex items-center justify-center min-h-[500px] h-full">
+                <Loader />
+            </div>
+        )
+    }
 
     return (
         <div className="flex flex-col py-8">
@@ -127,6 +171,7 @@ const Product = () => {
                         <div className="flex mt-4 mx-auto">
                             {Array.from({ length: 5 }).map((_, i) => (
                                 <svg
+                                    key={i}
                                     onClick={() =>
                                         setReviewModal({
                                             ...reviewModal,
@@ -154,6 +199,7 @@ const Product = () => {
                             Product Review
                         </label>
                         <textarea
+                            value={reviewModal.text}
                             onChange={(e) => {
                                 setReviewModal({
                                     ...reviewModal,
@@ -165,7 +211,10 @@ const Product = () => {
                             {reviewModal.text}
                         </textarea>
                         <div className="flex flex-row-reverse">
-                            <button className="mt-4 p-4 rounded-md text-white justify-center flex bg-indigo-500 hover:bg-indigo-600">
+                            <button
+                                onClick={handleReviewSubmit}
+                                className="mt-4 p-4 rounded-md text-white justify-center flex bg-indigo-500 hover:bg-indigo-600 active:bg-indigo-700"
+                            >
                                 Submit
                             </button>
                         </div>
@@ -265,7 +314,12 @@ const Product = () => {
                                 </p>
                             </div>
                             <button
-                                className="ml-auto bg-indigo-500 text-white px-4 py-4 rounded-md hover:bg-indigo-600 active:bg-indigo-700"
+                                className={
+                                    "ml-auto text-white px-4 py-4 rounded-md " +
+                                    (canReview
+                                        ? " bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 cursor-pointer"
+                                        : " bg-gray-300 cursor-not-allowed")
+                                }
                                 onClick={handleReviewModalOpen}
                             >
                                 Write a Review
@@ -274,7 +328,10 @@ const Product = () => {
                         {reviews.length ? (
                             <div className="flex flex-col items-center">
                                 {reviews.map((review) => (
-                                    <div className="flex w-full max-w-[700px] mt-8">
+                                    <div
+                                        className="flex w-full max-w-[700px] mt-8"
+                                        key={review.review_id}
+                                    >
                                         <div className="bg-gray-400 shrink-0 rounded-full h-12 w-12 flex items-center justify-center">
                                             <svg
                                                 xmlns="http://www.w3.org/2000/svg"
@@ -293,17 +350,19 @@ const Product = () => {
                                         </div>
                                         <div className="ml-4 w-full flex flex-col border-b pb-8 border-gray-300">
                                             <div className="font-medium">
-                                                {review.name}
+                                                {review.firstname}{" "}
+                                                {review.lastname}
                                             </div>
                                             <div className="text-gray-600">
                                                 {new Date(
-                                                    review.createdAt
+                                                    review.created_at
                                                 ).toDateString()}
                                             </div>
                                             <div className="flex my-2">
                                                 {Array.from({ length: 5 }).map(
                                                     (_, i) => (
                                                         <svg
+                                                            key={i}
                                                             xmlns="http://www.w3.org/2000/svg"
                                                             viewBox="0 0 24 24"
                                                             strokeWidth={1.5}

@@ -39,7 +39,7 @@ const CartItem = ({ item, onUpdateCartItem, onRemoveCartItem, disabled }) => {
                                             d="M 10,50 l 20,20 l 40,-40"
                                         />
                                     </svg>
-                                    <div className="text-red-600 ml-2">
+                                    <div className="text-green-600 ml-1">
                                         In stock
                                     </div>
                                 </>
@@ -58,7 +58,7 @@ const CartItem = ({ item, onUpdateCartItem, onRemoveCartItem, disabled }) => {
                                             d="M 10,10 l 80,80 M 10,90 l 80,-80"
                                         />
                                     </svg>
-                                    <div className="text-red-600 ml-2">
+                                    <div className="text-red-600 ml-1">
                                         Out of stock
                                     </div>
                                 </>

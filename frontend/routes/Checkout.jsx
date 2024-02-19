@@ -53,7 +53,7 @@ const Checkout = () => {
     }
 
     const handleFormSubmit = async () => {
-        if (!isFormValid || inStock) return
+        if (!isFormValid || !inStock) return
 
         setIsLoading(true)
 
