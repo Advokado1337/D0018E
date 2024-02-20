@@ -1,4 +1,4 @@
-import query from "../query.js"
+import query from "../utils/query.js"
 
 export default {
     get: async (req, res) => {

@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom"
 import React from "react"
 
 const CartItem = ({ item, onUpdateCartItem, onRemoveCartItem, disabled }) => {
@@ -7,14 +8,19 @@ const CartItem = ({ item, onUpdateCartItem, onRemoveCartItem, disabled }) => {
                 <div
                     className="aspect-square h-full rounded-md overflow-hidden bg-center bg-no-repeat bg-cover"
                     style={{
-                        backgroundImage: `url(/images/products/${item.image})`,
+                        backgroundImage: `url(/images/products/${
+                            JSON.parse(item.images)[0]?.url
+                        })`,
                     }}
                 ></div>
                 <div className="flex flex-col px-4">
                     <div className="flex flex-col">
-                        <div className="capitalize font-semibold">
+                        <Link
+                            className="capitalize font-semibold"
+                            to={"/product/" + item.product_id}
+                        >
                             {item.label}
-                        </div>
+                        </Link>
                         <div className="capitalize text-gray-700">
                             {item.color}
                         </div>

@@ -239,7 +239,9 @@ const Products = () => {
                                                     <img
                                                         src={
                                                             "/images/products/" +
-                                                            product.image
+                                                            JSON.parse(
+                                                                product.images
+                                                            )[0]?.url
                                                         }
                                                         className="h-full w-full object-cover object-center lg:h-full lg:w-full"
                                                     />

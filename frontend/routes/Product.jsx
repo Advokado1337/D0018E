@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom"
 import React, { useEffect, useState } from "react"
 import Loader from "../components/Loader.jsx"
+import colors from "../utils/colors.js"
 
 const Product = () => {
     const { id } = useParams()
@@ -67,45 +68,6 @@ const Product = () => {
         setInStock(inventory?.quantity > 0)
     }, [selectedColor, selectedSize])
 
-    const colors = {
-        gray: {
-            bg: "bg-gray-400",
-            border: "border-gray-400",
-        },
-        purple: {
-            bg: "bg-purple-400",
-            border: "border-purple-400",
-        },
-        orange: {
-            bg: "bg-orange-400",
-            border: "border-orange-400",
-        },
-        red: {
-            bg: "bg-red-400",
-            border: "border-red-400",
-        },
-        white: {
-            bg: "bg-white",
-            border: "border-gray-400",
-        },
-        black: {
-            bg: "bg-black",
-            border: "border-gray-900",
-        },
-        yellow: {
-            bg: "bg-yellow-400",
-            border: "border-yellow-400",
-        },
-        green: {
-            bg: "bg-green-400",
-            border: "border-green-400",
-        },
-        blue: {
-            bg: "bg-blue-400",
-            border: "border-blue-400",
-        },
-    }
-
     const handleReviewModalOpen = () => {
         if (!canReview) return
 
@@ -156,6 +118,12 @@ const Product = () => {
             </div>
         )
     }
+
+    const selectedImage = product.images.find(
+        (image) => image.color === selectedColor
+    )
+
+    const image = selectedImage ? selectedImage.url : product.images[0].url
 
     return (
         <div className="flex flex-col py-8">
@@ -225,7 +193,7 @@ const Product = () => {
                     <div className="flex w-full">
                         <div className="w-full border rounded-md bg-gray aspect-square overflow-hidden">
                             <img
-                                src={"/images/products/" + product.image}
+                                src={"/images/products/" + image}
                                 alt={product.label}
                                 className="object-cover w-full h-full"
                             />
