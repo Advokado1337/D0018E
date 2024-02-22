@@ -60,7 +60,14 @@ const App = () => {
     return (
         <Router>
             <Routes>
-                <Route path="/" element={<MainLayout>Hello</MainLayout>} />
+            <Route
+                    path="/"
+                    element={
+                        <MainLayout>
+                            <Products />
+                        </MainLayout>
+                    }
+                />
                 <Route
                     path="/products"
                     element={
