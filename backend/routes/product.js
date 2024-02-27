@@ -19,7 +19,7 @@ export default {
             "INSERT INTO product (label, price, description, colors, sizes, images) VALUES (?, ?, ?, ?, ?, ?)",
             [
                 body.label,
-                body.price,
+                body.price < 1 ? 1 : body.price,
                 body.description,
                 JSON.stringify(body.colors),
                 JSON.stringify(body.sizes),
@@ -167,7 +167,7 @@ export default {
                 }
                 if (body.price) {
                     updates.push("price = ?")
-                    paramsList.push(body.price)
+                    paramsList.push(body.price < 1 ? 1 : body.price)
                 }
                 if (body.description) {
                     updates.push("description = ?")
